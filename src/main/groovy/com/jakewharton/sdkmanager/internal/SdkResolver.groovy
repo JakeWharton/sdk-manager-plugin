@@ -5,6 +5,10 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.StopExecutionException
 
 class SdkResolver {
+  static File resolve(Project project) {
+    return new SdkResolver(project).resolve()
+  }
+
   final def log = Logger.getLogger SdkResolver
   final def userHome = new File(System.getProperty('user.home'))
   final def userAndroidTemp = new File(userHome, '.android-sdk.temp')

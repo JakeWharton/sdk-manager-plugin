@@ -4,21 +4,31 @@ import org.apache.log4j.Logger
 import org.gradle.api.Project
 import org.gradle.api.tasks.StopExecutionException
 
-import static com.android.SdkConstants.*
+import static com.android.SdkConstants.ANDROID_HOME_ENV
+import static com.android.SdkConstants.FN_LOCAL_PROPERTIES
+import static com.android.SdkConstants.SDK_DIR_PROPERTY
 
 class SdkResolver {
   static File resolve(Project project) {
-    return new SdkResolver(project).resolve()
+    return new SdkResolver(project, new System.Real(), new Downloader.Real()).resolve()
   }
 
   final def log = Logger.getLogger SdkResolver
-  final def userHome = new File(System.getProperty('user.home'))
-  final def userAndroidTemp = new File(userHome, '.android-sdk.temp')
-  final def userAndroid = new File(userHome, '.android-sdk')
-  final def project
+  final Project project
+  final System system
+  final Downloader downloader
+  final File userHome
+  final File userAndroidTemp
+  final File userAndroid
 
-  SdkResolver(Project project) {
-    this.project = project;
+  SdkResolver(Project project, System system, Downloader downloader) {
+    this.project = project
+    this.system = system
+    this.downloader = downloader
+
+    userHome = new File(system.property('user.home'))
+    userAndroidTemp = new File(userHome, '.android-sdk.temp')
+    userAndroid = new File(userHome, '.android-sdk')
   }
 
   File resolve() {
@@ -43,7 +53,7 @@ class SdkResolver {
     log.debug 'Missing local.properties.'
 
     // Look for ANDROID_HOME environment variable.
-    def androidHome = SystemEnvironment.getValue ANDROID_HOME_ENV
+    def androidHome = system.env ANDROID_HOME_ENV
     if (androidHome != null) {
       log.debug "Found ANDROID_HOME at '$androidHome'. Writing to local.properties."
 
@@ -69,7 +79,7 @@ class SdkResolver {
     log.info 'Downloading and extracting Android SDK.'
 
     // Download the SDK zip and extract it.
-    SdkDownload.get().download(userAndroidTemp, userAndroid)
+    downloader.download(userAndroidTemp, userAndroid)
     log.debug "SDK extracted at '$userAndroid.absolutePath'. Writing to local.properties."
 
     localProperties.withOutputStream {

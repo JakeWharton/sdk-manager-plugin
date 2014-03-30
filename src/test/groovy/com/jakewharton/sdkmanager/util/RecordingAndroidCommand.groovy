@@ -1,4 +1,6 @@
-package com.jakewharton.sdkmanager.internal
+package com.jakewharton.sdkmanager.util
+
+import com.jakewharton.sdkmanager.internal.AndroidCommand
 
 final class RecordingAndroidCommand extends ArrayList<String> implements AndroidCommand {
   int nextReturnCode = 0

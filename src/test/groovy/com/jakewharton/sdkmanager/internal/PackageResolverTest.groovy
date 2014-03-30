@@ -1,6 +1,8 @@
 package com.jakewharton.sdkmanager.internal
+
 import com.jakewharton.sdkmanager.FixtureName
 import com.jakewharton.sdkmanager.TemporaryFixture
+import com.jakewharton.sdkmanager.util.RecordingAndroidCommand
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before

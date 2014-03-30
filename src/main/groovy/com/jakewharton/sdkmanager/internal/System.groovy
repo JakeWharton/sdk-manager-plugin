@@ -1,0 +1,17 @@
+package com.jakewharton.sdkmanager.internal;
+
+/** An indirection to {@link java.lang.System}. */
+interface System {
+  String env(String name);
+  String property(String key);
+
+  static final class Real implements System {
+    @Override String env(String name) {
+      return java.lang.System.getenv(name)
+    }
+
+    @Override String property(String key) {
+      return java.lang.System.getProperty(key);
+    }
+  }
+}

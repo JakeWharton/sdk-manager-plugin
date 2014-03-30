@@ -67,7 +67,7 @@ class SdkResolver {
     log.info 'Downloading and extracting Android SDK.'
 
     // Download the SDK zip and extract it.
-    SdkDownload.get().download(userAndroidTemp, userAndroid)
+    Platform.get().sdkDownload.download(userAndroidTemp, userAndroid)
     log.debug "SDK extracted at '$userAndroid.absolutePath'. Writing to local.properties."
 
     localProperties.withOutputStream {

@@ -1,5 +1,6 @@
 package com.jakewharton.sdkmanager.internal
 
+import com.android.SdkConstants
 import com.google.common.io.Files
 import org.apache.log4j.Logger
 import org.rauschig.jarchivelib.ArchiveFormat
@@ -7,13 +8,22 @@ import org.rauschig.jarchivelib.ArchiverFactory
 import org.rauschig.jarchivelib.CompressionType
 
 /** Manages platform-specific SDK downloads. */
-class SdkDownload {
-  static SdkDownload of(String suffix, ArchiveFormat format) {
-    return of(suffix, format, null)
-  }
+enum SdkDownload {
+  WINDOWS('windows.zip', ArchiveFormat.ZIP, null),
+  LINUX('linux.tgz', ArchiveFormat.TAR, CompressionType.GZIP),
+  DARWIN('macosx.zip', ArchiveFormat.ZIP, null);
 
-  static SdkDownload of(String suffix, ArchiveFormat format, CompressionType compression) {
-    return new SdkDownload(suffix, format, compression)
+  static SdkDownload get() {
+    switch (SdkConstants.currentPlatform()) {
+      case SdkConstants.PLATFORM_WINDOWS:
+        return WINDOWS
+      case SdkConstants.PLATFORM_LINUX:
+        return LINUX
+      case SdkConstants.PLATFORM_DARWIN:
+        return DARWIN
+      default:
+        throw new IllegalStateException("Unknown platform '${SdkConstants.currentPlatformName()}'")
+    }
   }
 
   final def log = Logger.getLogger SdkDownload

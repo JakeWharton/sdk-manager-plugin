@@ -4,6 +4,8 @@ import org.apache.log4j.Logger
 import org.gradle.api.Project
 import org.gradle.api.tasks.StopExecutionException
 
+import static com.android.SdkConstants.*
+
 class SdkResolver {
   static File resolve(Project project) {
     return new SdkResolver(project).resolve()
@@ -20,14 +22,14 @@ class SdkResolver {
   }
 
   File resolve() {
-    def localProperties = project.file 'local.properties'
+    def localProperties = project.file FN_LOCAL_PROPERTIES
 
     // Check for existing local.properties file and the SDK it points to.
     if (localProperties.exists()) {
       log.debug "Found local.properties at '$localProperties.absolutePath'."
       def properties = new Properties()
       localProperties.withInputStream { properties.load it }
-      def sdkDirPath = properties.getProperty 'sdk.dir'
+      def sdkDirPath = properties.getProperty SDK_DIR_PROPERTY
       log.debug "Found sdk.dir at '$sdkDirPath'."
       def sdkDir = new File(sdkDirPath)
       if (!sdkDir.exists()) {
@@ -41,12 +43,12 @@ class SdkResolver {
     log.debug 'Missing local.properties.'
 
     // Look for ANDROID_HOME environment variable.
-    def androidHome = SystemEnvironment.getValue 'ANDROID_HOME'
+    def androidHome = SystemEnvironment.getValue ANDROID_HOME_ENV
     if (androidHome != null) {
       log.debug "Found ANDROID_HOME at '$androidHome'. Writing to local.properties."
 
       localProperties.withOutputStream {
-        it << "sdk.dir=$androidHome"
+        it << "$SDK_DIR_PROPERTY=$androidHome"
       }
       return new File(androidHome)
     }
@@ -58,7 +60,7 @@ class SdkResolver {
       log.debug "Found existing SDK at '$userAndroid.absolutePath'. Writing to local.properties."
 
       localProperties.withOutputStream {
-        it << "sdk.dir=$userAndroid.absolutePath"
+        it << "$SDK_DIR_PROPERTY=$userAndroid.absolutePath"
       }
 
       return userAndroid
@@ -67,11 +69,11 @@ class SdkResolver {
     log.info 'Downloading and extracting Android SDK.'
 
     // Download the SDK zip and extract it.
-    Platform.get().sdkDownload.download(userAndroidTemp, userAndroid)
+    SdkDownload.get().download(userAndroidTemp, userAndroid)
     log.debug "SDK extracted at '$userAndroid.absolutePath'. Writing to local.properties."
 
     localProperties.withOutputStream {
-      it << "sdk.dir=$userAndroid.absolutePath"
+      it << "$SDK_DIR_PROPERTY=$userAndroid.absolutePath"
     }
 
     return userAndroid

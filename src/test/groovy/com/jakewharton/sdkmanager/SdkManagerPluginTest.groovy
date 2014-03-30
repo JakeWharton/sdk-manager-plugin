@@ -6,6 +6,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+import static com.android.SdkConstants.*
 import static org.fest.assertions.api.Assertions.assertThat
 
 class SdkManagerPluginTest {
@@ -32,10 +33,10 @@ class SdkManagerPluginTest {
 
   /** Assert that the project's local.properties {@code sdk.dir} points at {@code sdkFolder}. */
   def assertLocalProperties(File sdkFolder) {
-    def localProperties = new File(fixture.project, 'local.properties')
+    def localProperties = new File(fixture.project, FN_LOCAL_PROPERTIES)
     def properties = new Properties()
     localProperties.withInputStream { properties.load it }
-    def sdkDirPath = properties.getProperty 'sdk.dir'
+    def sdkDirPath = properties.getProperty SDK_DIR_PROPERTY
     assertThat(sdkDirPath).isEqualTo(sdkFolder.absolutePath)
   }
 
@@ -58,7 +59,7 @@ class SdkManagerPluginTest {
   @Test public void missingLocalPropertiesWithAndroidHome() {
     // Point the ANDROID_HOME environment variable to the custom SDK location.
     File sdk = new File(fixture.root, 'sdk')
-    env.put 'ANDROID_HOME', sdk.absolutePath
+    env.put ANDROID_HOME_ENV, sdk.absolutePath
     assertThat(sdk.exists())
 
     // Make sure no normal SDK exists.

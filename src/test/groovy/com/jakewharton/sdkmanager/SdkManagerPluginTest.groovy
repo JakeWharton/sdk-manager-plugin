@@ -3,10 +3,13 @@ package com.jakewharton.sdkmanager
 import com.jakewharton.sdkmanager.internal.SystemEnvironment
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
-import static com.android.SdkConstants.*
+import static com.android.SdkConstants.ANDROID_HOME_ENV
+import static com.android.SdkConstants.FN_LOCAL_PROPERTIES
+import static com.android.SdkConstants.SDK_DIR_PROPERTY
 import static org.fest.assertions.api.Assertions.assertThat
 
 class SdkManagerPluginTest {
@@ -40,6 +43,7 @@ class SdkManagerPluginTest {
     assertThat(sdkDirPath).isEqualTo(sdkFolder.absolutePath)
   }
 
+  @Ignore
   @FixtureName("no-sdk")
   @Test public void noSdk() {
     assertThat(fixture.sdk).doesNotExist()
@@ -48,6 +52,7 @@ class SdkManagerPluginTest {
     assertLocalProperties(fixture.sdk)
   }
 
+  @Ignore
   @FixtureName("missing-local-properties")
   @Test public void missingLocalProperties() {
     assertThat(fixture.sdk).exists()
@@ -55,6 +60,7 @@ class SdkManagerPluginTest {
     assertLocalProperties(fixture.sdk)
   }
 
+  @Ignore
   @FixtureName("missing-local-properties-with-android-home")
   @Test public void missingLocalPropertiesWithAndroidHome() {
     // Point the ANDROID_HOME environment variable to the custom SDK location.
@@ -72,37 +78,5 @@ class SdkManagerPluginTest {
 
     // Ensure that the project's local.properties points at the custom SDK location.
     assertLocalProperties(sdk)
-  }
-
-  @FixtureName("missing-api-level")
-  @Test public void missingApiLevel() {
-  }
-
-  @FixtureName("missing-api-sources")
-  @Test public void missingApiSources() {
-  }
-
-  @FixtureName("missing-build-tools")
-  @Test public void missingBuildTools() {
-  }
-
-  @FixtureName("outdated-build-tools")
-  @Test public void outdatedBuildTools() {
-  }
-
-  @FixtureName("missing-support-m2")
-  @Test public void missingSupportRepository() {
-  }
-
-  @FixtureName("outdated-support-m2")
-  @Test public void outdatedSupportRepository() {
-  }
-
-  @FixtureName("missing-play-services-m2")
-  @Test public void missingPlayServicesRepository() {
-  }
-
-  @FixtureName("outdated-play-services-m2")
-  @Test public void outdatedPlayServicesRepository() {
   }
 }

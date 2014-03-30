@@ -1,65 +1,75 @@
 package com.jakewharton.sdkmanager.internal
 
-import com.android.SdkConstants
 import com.google.common.io.Files
 import org.apache.log4j.Logger
-import org.rauschig.jarchivelib.ArchiveFormat
 import org.rauschig.jarchivelib.ArchiverFactory
-import org.rauschig.jarchivelib.CompressionType
+
+import static com.android.SdkConstants.PLATFORM_DARWIN
+import static com.android.SdkConstants.PLATFORM_LINUX
+import static com.android.SdkConstants.PLATFORM_WINDOWS
+import static com.android.SdkConstants.currentPlatform
+import static org.rauschig.jarchivelib.ArchiveFormat.TAR
+import static org.rauschig.jarchivelib.ArchiveFormat.ZIP
+import static org.rauschig.jarchivelib.CompressionType.GZIP
 
 /** Manages platform-specific SDK downloads. */
 enum SdkDownload {
-  WINDOWS('windows.zip', ArchiveFormat.ZIP, null),
-  LINUX('linux.tgz', ArchiveFormat.TAR, CompressionType.GZIP),
-  DARWIN('macosx.zip', ArchiveFormat.ZIP, null);
+  WINDOWS('windows','zip'),
+  LINUX('linux', 'tgz'),
+  DARWIN('macosx', 'zip');
 
   static SdkDownload get() {
-    switch (SdkConstants.currentPlatform()) {
-      case SdkConstants.PLATFORM_WINDOWS:
+    switch (currentPlatform()) {
+      case PLATFORM_WINDOWS:
         return WINDOWS
-      case SdkConstants.PLATFORM_LINUX:
+      case PLATFORM_LINUX:
         return LINUX
-      case SdkConstants.PLATFORM_DARWIN:
+      case PLATFORM_DARWIN:
         return DARWIN
       default:
-        throw new IllegalStateException("Unknown platform '${SdkConstants.currentPlatformName()}'")
+        throw new IllegalStateException("Unknown platform.")
     }
   }
 
   final def log = Logger.getLogger SdkDownload
   final String suffix
-  final ArchiveFormat format
-  final CompressionType compression
+  final String ext
 
-  SdkDownload(String suffix, ArchiveFormat format, CompressionType compression) {
+  SdkDownload(String suffix, String ext) {
     this.suffix = suffix
-    this.format = format
-    this.compression = compression
+    this.ext = ext
   }
 
   /** Download the SDK to {@code temp} and extract to {@code dest}. */
   void download(File temp, File dest) {
-    def url = "http://dl.google.com/android/android-sdk_r22.6.2-$suffix"
+    def url = "http://dl.google.com/android/android-sdk_r22.6.2-$suffix.$ext"
     log.debug "Downloading SDK from $url."
 
     temp.withOutputStream {
       it << new URL(url).content
     }
 
-    final def archiver
-    if (compression != null) {
-      archiver = ArchiverFactory.createArchiver format, compression
-    } else {
-      archiver = ArchiverFactory.createArchiver format
-    }
-
+    // Archives have a single child folder. Extract to the parent directory.
     def parentFile = temp.getParentFile()
     log.debug "Extracting SDK to $parentFile.absolutePath."
-    archiver.extract(temp, parentFile)
+    getArchiver().extract(temp, parentFile)
 
-    def extracted = new File(parentFile, 'android-sdk-macosx')
+    // Move the aforementioned child folder to the real destination.
+    def extracted = new File(parentFile, "android-sdk-$suffix")
     Files.move extracted, dest
 
+    // Delete downloaded archive.
     temp.delete()
+  }
+
+  def getArchiver() {
+    switch (ext) {
+      case 'zip':
+        return ArchiverFactory.createArchiver(ZIP)
+      case 'tgz':
+        return ArchiverFactory.createArchiver(TAR, GZIP)
+      default:
+        throw new IllegalArgumentException("Unknown archive format '$ext'.")
+    }
   }
 }

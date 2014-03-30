@@ -1,22 +1,182 @@
 package com.jakewharton.sdkmanager.internal
-
+import com.jakewharton.sdkmanager.FixtureName
+import com.jakewharton.sdkmanager.TemporaryFixture
+import org.gradle.api.Project
+import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
-import static com.jakewharton.sdkmanager.internal.PackageResolver.fulfillsDependency
+import static com.android.SdkConstants.FN_LOCAL_PROPERTIES
+import static com.android.SdkConstants.SDK_DIR_PROPERTY
 import static org.fest.assertions.api.Assertions.assertThat
 
 class PackageResolverTest {
-  @Test public void fulfillsDependencyExamples() {
-    def version = [19, 1, 0] as int[]
-    assertThat(fulfillsDependency('18.0.0', version)).isTrue()
-    assertThat(fulfillsDependency('18.0.+', version)).isTrue()
-    assertThat(fulfillsDependency('18.+', version)).isTrue()
-    assertThat(fulfillsDependency('19.1.0', version)).isTrue()
-    assertThat(fulfillsDependency('19.1.+', version)).isTrue()
-    assertThat(fulfillsDependency('19.+', version)).isTrue()
-    assertThat(fulfillsDependency('+', version)).isTrue()
-    assertThat(fulfillsDependency('19.1.1', version)).isFalse()
-    assertThat(fulfillsDependency('19.2.0', version)).isFalse()
-    assertThat(fulfillsDependency('20.1.0', version)).isFalse()
+  @Rule public TemporaryFixture fixture = new TemporaryFixture();
+
+  Project project
+  RecordingAndroidCommand androidCommand
+  PackageResolver packageResolver
+
+  @Before public void setUp() {
+    project = ProjectBuilder.builder()
+        .withProjectDir(fixture.project)
+        .build()
+
+    // Write a local.properties file that points to the fixture SDK directory.
+    new File(fixture.project, FN_LOCAL_PROPERTIES).withOutputStream {
+      it << "$SDK_DIR_PROPERTY=${fixture.sdk.absolutePath}"
+    }
+
+    androidCommand = new RecordingAndroidCommand()
+    packageResolver = new PackageResolver(project, fixture.sdk, androidCommand)
+  }
+
+  @FixtureName("up-to-date-build-tools")
+  @Test public void upToDateBuildToolsRecognized() {
+    project.apply plugin: 'android'
+    project.android {
+      buildToolsVersion '19.0.3'
+    }
+
+    packageResolver.resolveBuildTools()
+    assertThat(androidCommand).isEmpty()
+  }
+
+  @FixtureName("missing-build-tools")
+  @Test public void missingBuildToolsAreDownloaded() {
+    project.apply plugin: 'android'
+    project.android {
+      buildToolsVersion '19.0.3'
+    }
+
+    packageResolver.resolveBuildTools()
+    assertThat(androidCommand).containsExactly('update build-tools-19.0.3')
+  }
+
+  @FixtureName("outdated-build-tools")
+  @Test public void outdatedBuildToolsAreDownloaded() {
+    project.apply plugin: 'android'
+    project.android {
+      buildToolsVersion '19.0.3'
+    }
+
+    packageResolver.resolveBuildTools()
+    assertThat(androidCommand).containsExactly('update build-tools-19.0.3')
+  }
+
+  @FixtureName("up-to-date-compilation-api")
+  @Test public void upToDateCompilationApiRecognized() {
+    project.apply plugin: 'android'
+    project.android {
+      compileSdkVersion 19
+    }
+
+    packageResolver.resolveCompileVersion()
+    assertThat(androidCommand).isEmpty()
+  }
+
+  @FixtureName("missing-compilation-api")
+  @Test public void missingCompilationApiIsDownloaded() {
+    project.apply plugin: 'android'
+    project.android {
+      compileSdkVersion 19
+    }
+
+    packageResolver.resolveCompileVersion()
+    assertThat(androidCommand).containsExactly('update android-19')
+  }
+
+  @FixtureName("outdated-compilation-api")
+  @Test public void outdatedCompilationApiIsDownloaded() {
+    project.apply plugin: 'android'
+    project.android {
+      compileSdkVersion 19
+    }
+
+    packageResolver.resolveCompileVersion()
+    assertThat(androidCommand).containsExactly('update android-19')
+  }
+
+  @FixtureName("missing-android-m2repository")
+  @Test public void noSupportLibraryDependencyDoesNotDownload() {
+    project.apply plugin: 'android'
+
+    packageResolver.resolveSupportLibraryRepository()
+    assertThat(androidCommand).isEmpty()
+  }
+
+  @FixtureName("up-to-date-android-m2repository")
+  @Test public void upToDateSupportLibraryRepositoryRecognized() {
+    project.apply plugin: 'android'
+    project.dependencies {
+      compile 'com.android.support:support-v4:19.1.0'
+    }
+
+    packageResolver.resolveSupportLibraryRepository()
+    assertThat(androidCommand).isEmpty()
+  }
+
+  @FixtureName("missing-android-m2repository")
+  @Test public void missingSupportLibraryRepositoryIsDownloaded() {
+    project.apply plugin: 'android'
+    project.dependencies {
+      compile 'com.android.support:support-v4:19.1.0'
+    }
+
+    packageResolver.resolveSupportLibraryRepository()
+    assertThat(androidCommand).containsExactly('update extra-android-m2repository')
+  }
+
+  @FixtureName("outdated-android-m2repository")
+  @Test public void outdatedSupportLibraryRepositoryIsDownloaded() {
+    project.apply plugin: 'android'
+    project.dependencies {
+      compile 'com.android.support:support-v4:19.1.0'
+    }
+
+    packageResolver.resolveSupportLibraryRepository()
+    assertThat(androidCommand).containsExactly('update extra-android-m2repository')
+  }
+
+  @FixtureName("missing-google-m2repository")
+  @Test public void noPlayServicesDependencyDoesNotDownload() {
+    project.apply plugin: 'android'
+
+    packageResolver.resolvePlayServiceRepository()
+    assertThat(androidCommand).isEmpty()
+  }
+
+  @FixtureName("up-to-date-google-m2repository")
+  @Test public void upToDatePlayServicesRepositoryRecognized() {
+    project.apply plugin: 'android'
+    project.dependencies {
+      compile 'com.google.android.gms:play-services:4.3.23'
+    }
+
+    packageResolver.resolvePlayServiceRepository()
+    assertThat(androidCommand).isEmpty()
+  }
+
+  @FixtureName("missing-google-m2repository")
+  @Test public void missingPlayServicesRepositoryDownloaded() {
+    project.apply plugin: 'android'
+    project.dependencies {
+      compile 'com.google.android.gms:play-services:4.3.23'
+    }
+
+    packageResolver.resolvePlayServiceRepository()
+    assertThat(androidCommand).containsExactly('update extra-google-m2repository')
+  }
+
+  @FixtureName("outdated-google-m2repository")
+  @Test public void outdatedPlayServicesRepositoryDownloaded() {
+    project.apply plugin: 'android'
+    project.dependencies {
+      compile 'com.google.android.gms:play-services:4.3.23'
+    }
+
+    packageResolver.resolvePlayServiceRepository()
+    assertThat(androidCommand).containsExactly('update extra-google-m2repository')
   }
 }

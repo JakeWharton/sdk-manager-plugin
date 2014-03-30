@@ -6,6 +6,7 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
+import static com.android.SdkConstants.FD_TOOLS
 import static org.fest.assertions.api.Assertions.assertThat
 
 @RunWith(Parameterized)
@@ -31,5 +32,6 @@ class SdkDownloadTest {
 
     assertThat(download).doesNotExist()
     assertThat(destination).exists()
+    assertThat(new File(destination, FD_TOOLS)).exists()
   }
 }

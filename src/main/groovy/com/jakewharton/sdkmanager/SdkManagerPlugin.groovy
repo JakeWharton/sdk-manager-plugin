@@ -1,4 +1,5 @@
 package com.jakewharton.sdkmanager
+
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.jakewharton.sdkmanager.internal.PackageResolver
@@ -7,7 +8,6 @@ import org.apache.log4j.Logger
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.StopExecutionException
-
 import java.util.concurrent.TimeUnit
 
 class SdkManagerPlugin implements Plugin<Project> {

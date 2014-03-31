@@ -26,7 +26,7 @@ public class TemporaryFixture extends TemporaryFolder {
   }
 
   @Override protected void before() throws Throwable {
-    super.create();
+    super.before();
 
     File fixtures = new File("src/test/fixtures");
     File from = new File(fixtures, fixtureName);
@@ -42,10 +42,6 @@ public class TemporaryFixture extends TemporaryFolder {
 
     project = new File(root, FOLDER_PROJECT);
     sdk = new File(root, FOLDER_SDK);
-  }
-
-  @Override protected void after() {
-    super.delete();
   }
 
   @Override public Statement apply(Statement base, Description description) {

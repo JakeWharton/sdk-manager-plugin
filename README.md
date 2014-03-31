@@ -22,6 +22,11 @@ Supported functionality:
    declared it will be updated.
 
 
+*Note: By using this plugin you acknowledge that associated licenses of the components downloaded
+are accepted automatically on your behalf. You are required to have accepted the respective licenses
+of these components prior to using this plugin.*
+
+
 
 Usage
 -----

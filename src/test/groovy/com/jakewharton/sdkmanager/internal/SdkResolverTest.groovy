@@ -5,6 +5,7 @@ import com.jakewharton.sdkmanager.TemporaryFixture
 import com.jakewharton.sdkmanager.util.FakeSystem
 import com.jakewharton.sdkmanager.util.RecordingDownloader
 import org.gradle.api.Project
+import org.gradle.api.tasks.StopExecutionException
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
@@ -13,6 +14,7 @@ import org.junit.Test
 import static com.android.SdkConstants.FN_LOCAL_PROPERTIES
 import static com.android.SdkConstants.SDK_DIR_PROPERTY
 import static org.fest.assertions.api.Assertions.assertThat
+import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown
 
 class SdkResolverTest {
   @Rule public TemporaryFixture fixture = new TemporaryFixture();
@@ -49,19 +51,21 @@ class SdkResolverTest {
   @Test public void missingSdk() {
     assertThat(fixture.sdk).doesNotExist()
     assertThat(localProperties).doesNotExist()
-    sdkResolver.resolve()
+    def resolvedSdk = sdkResolver.resolve()
     assertThat(downloader).containsExactly('download')
-    assertThat(fixture.sdk).exists()
-    assertLocalProperties(fixture.sdk)
+    assertThat(resolvedSdk).isEqualTo(fixture.sdk)
+    assertThat(resolvedSdk).exists()
+    assertLocalProperties(resolvedSdk)
   }
 
   @FixtureName("missing-local-properties")
   @Test public void missingLocalProperties() {
     assertThat(fixture.sdk).exists()
     assertThat(localProperties).doesNotExist()
-    sdkResolver.resolve()
+    def resolvedSdk = sdkResolver.resolve()
     assertThat(downloader).isEmpty()
-    assertLocalProperties(fixture.sdk)
+    assertThat(resolvedSdk).isEqualTo(fixture.sdk)
+    assertLocalProperties(resolvedSdk)
   }
 
   @FixtureName("missing-local-properties-with-android-home")
@@ -70,8 +74,25 @@ class SdkResolverTest {
     File sdk = new File(fixture.root, 'sdk')
     system.env.put 'ANDROID_HOME', sdk.absolutePath
     assertThat(sdk).exists()
-    sdkResolver.resolve()
+    def resolvedSdk = sdkResolver.resolve()
     assertThat(downloader).isEmpty()
+    assertThat(resolvedSdk).isEqualTo(sdk)
     assertLocalProperties(sdk)
+  }
+
+  @FixtureName("invalid-local-properties")
+  @Test public void invalidLocalPropertiesThrows() {
+    localProperties.withOutputStream {
+      it << "$SDK_DIR_PROPERTY=/invalid/pointer"
+    }
+    try {
+      sdkResolver.resolve()
+      failBecauseExceptionWasNotThrown(StopExecutionException)
+    } catch (StopExecutionException e) {
+      assertThat(e).
+          hasMessage(
+              "Specified SDK directory '/invalid/pointer' in 'local.properties' is not found.")
+    }
+    assertThat(downloader).isEmpty()
   }
 }

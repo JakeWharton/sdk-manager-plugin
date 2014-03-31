@@ -1,9 +1,0 @@
-import com.jakewharton.sdkmanager.SdkManagerPlugin
-
-apply plugin: SdkManagerPlugin
-apply plugin: 'android'
-
-android {
-  compileSdkVersion 19
-  buildToolsVersion '19.0.3'
-}

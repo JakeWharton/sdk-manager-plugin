@@ -1,6 +1,6 @@
 package com.jakewharton.sdkmanager.internal
 
-import com.google.common.io.Files
+import org.apache.commons.io.FileUtils
 import org.apache.log4j.Logger
 import org.rauschig.jarchivelib.ArchiverFactory
 
@@ -56,7 +56,7 @@ enum SdkDownload {
 
     // Move the aforementioned child folder to the real destination.
     def extracted = new File(parentFile, "android-sdk-$suffix")
-    Files.move extracted, dest
+    FileUtils.moveDirectory extracted, dest
 
     // Delete downloaded archive.
     temp.delete()

@@ -59,7 +59,7 @@ class PackageResolver {
       return
     }
 
-    log.lifecycle "Build tools $buildToolsRevision missing. Downloading from SDK manager."
+    log.lifecycle "Build tools $buildToolsRevision missing. Downloading...."
 
     def code = androidCommand.update "build-tools-$buildToolsRevision"
     if (code != 0) {
@@ -77,7 +77,7 @@ class PackageResolver {
       return
     }
 
-    log.lifecycle "Compilation API $compileVersion missing. Downloading from SDK manager."
+    log.lifecycle "Compilation API $compileVersion missing. Downloading..."
 
     def code = androidCommand.update compileVersion
     if (code != 0) {
@@ -97,7 +97,7 @@ class PackageResolver {
     def needsDownload = false;
     if (!androidRepositoryDir.exists()) {
       needsDownload = true
-      log.lifecycle 'Support library repository missing. Downloading from SDK manager.'
+      log.lifecycle 'Support library repository missing. Downloading...'
 
       // Add future repository to the project since the main plugin skips it when missing.
       project.repositories.maven {
@@ -105,7 +105,7 @@ class PackageResolver {
       }
     } else if (!dependenciesAvailable(supportLibraryDeps)) {
       needsDownload = true
-      log.lifecycle 'Support library repository outdated. Downloading update from SDK manager.'
+      log.lifecycle 'Support library repository outdated. Downloading update...'
     }
 
     if (needsDownload) {
@@ -128,7 +128,7 @@ class PackageResolver {
     def needsDownload = false;
     if (!googleRepositoryDir.exists()) {
       needsDownload = true
-      log.lifecycle 'Play services repository missing. Downloading from SDK manager.'
+      log.lifecycle 'Play services repository missing. Downloading...'
 
       // Add future repository to the project since the main plugin skips it when missing.
       project.repositories.maven {
@@ -136,7 +136,7 @@ class PackageResolver {
       }
     } else if (!dependenciesAvailable(playServicesDeps)) {
       needsDownload = true
-      log.lifecycle 'Play services repository outdated. Downloading update from SDK manager.'
+      log.lifecycle 'Play services repository outdated. Downloading update...'
     }
 
     if (needsDownload) {

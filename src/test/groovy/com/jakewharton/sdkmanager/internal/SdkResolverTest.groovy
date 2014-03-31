@@ -11,6 +11,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+import static com.android.SdkConstants.ANDROID_HOME_ENV
 import static com.android.SdkConstants.FN_LOCAL_PROPERTIES
 import static com.android.SdkConstants.SDK_DIR_PROPERTY
 import static org.fest.assertions.api.Assertions.assertThat
@@ -78,7 +79,7 @@ class SdkResolverTest {
   @Test public void missingLocalPropertiesWithAndroidHome() {
     // Point the ANDROID_HOME environment variable to the custom SDK location.
     File sdk = new File(fixture.root, 'sdk')
-    system.env.put 'ANDROID_HOME', sdk.absolutePath
+    system.env.put ANDROID_HOME_ENV, sdk.absolutePath
     assertThat(sdk).exists()
     def resolvedSdk = sdkResolver.resolve()
     assertThat(downloader).isEmpty()
@@ -121,6 +122,19 @@ class SdkResolverTest {
       assertThat(e).
           hasMessage(
               "Specified SDK directory '/invalid/pointer' in 'local.properties' is not found.")
+    }
+    assertThat(downloader).isEmpty()
+  }
+
+  @FixtureName("invalid-android-home")
+  @Test public void invalidAndroidHomeThrows() {
+    system.env.put ANDROID_HOME_ENV, '/invalid/pointer'
+    try {
+      sdkResolver.resolve()
+      failBecauseExceptionWasNotThrown(StopExecutionException)
+    } catch (StopExecutionException e) {
+      assertThat(e).
+          hasMessage("Specified SDK directory '/invalid/pointer' in 'ANDROID_HOME' is not found.")
     }
     assertThat(downloader).isEmpty()
   }

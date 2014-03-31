@@ -37,25 +37,31 @@ class SdkResolver {
 
     // Check for existing local.properties file and the SDK it points to.
     if (localProperties.exists()) {
-      log.debug "Found local.properties at '$localProperties.absolutePath'."
+      log.debug "Found $FN_LOCAL_PROPERTIES at '$localProperties.absolutePath'."
       def properties = new Properties()
       localProperties.withInputStream { properties.load it }
       def sdkDirPath = properties.getProperty SDK_DIR_PROPERTY
-      log.debug "Found sdk.dir at '$sdkDirPath'."
+      log.debug "Found $SDK_DIR_PROPERTY of '$sdkDirPath'."
       def sdkDir = new File(sdkDirPath)
       if (!sdkDir.exists()) {
         throw new StopExecutionException(
-            "Specified SDK directory '$sdkDirPath' in 'local.properties' is not found.")
+            "Specified SDK directory '$sdkDirPath' in '$FN_LOCAL_PROPERTIES' is not found.")
       }
       return sdkDir
     }
 
-    log.debug 'Missing local.properties.'
+    log.debug "Missing $FN_LOCAL_PROPERTIES."
 
     // Look for ANDROID_HOME environment variable.
     def androidHome = system.env ANDROID_HOME_ENV
     if (androidHome != null) {
-      log.debug "Found ANDROID_HOME at '$androidHome'. Writing to local.properties."
+      def sdkDir = new File(androidHome)
+      if (!sdkDir.exists()) {
+        throw new StopExecutionException(
+            "Specified SDK directory '$androidHome' in '$ANDROID_HOME_ENV' is not found.")
+      }
+
+      log.debug "Found $ANDROID_HOME_ENV at '$androidHome'. Writing to $FN_LOCAL_PROPERTIES."
 
       localProperties.withOutputStream {
         it << "$SDK_DIR_PROPERTY=$androidHome"
@@ -63,11 +69,11 @@ class SdkResolver {
       return new File(androidHome)
     }
 
-    log.debug 'Missing ANDROID_HOME.'
+    log.debug "Missing $ANDROID_HOME_ENV."
 
     // Look for an SDK in the home directory.
     if (userAndroid.exists()) {
-      log.debug "Found existing SDK at '$userAndroid.absolutePath'. Writing to local.properties."
+      log.debug "Found existing SDK at '$userAndroid.absolutePath'. Writing to $FN_LOCAL_PROPERTIES."
 
       localProperties.withOutputStream {
         it << "$SDK_DIR_PROPERTY=$userAndroid.absolutePath"
@@ -76,11 +82,11 @@ class SdkResolver {
       return userAndroid
     }
 
-    log.lifecycle 'Downloading and extracting Android SDK.'
+    log.lifecycle 'Android SDK not found. Downloading...'
 
     // Download the SDK zip and extract it.
     downloader.download(userAndroidTemp, userAndroid)
-    log.debug "SDK extracted at '$userAndroid.absolutePath'. Writing to local.properties."
+    log.lifecycle "SDK extracted at '$userAndroid.absolutePath'. Writing to $FN_LOCAL_PROPERTIES."
 
     localProperties.withOutputStream {
       it << "$SDK_DIR_PROPERTY=$userAndroid.absolutePath"

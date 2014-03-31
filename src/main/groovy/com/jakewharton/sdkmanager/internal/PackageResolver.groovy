@@ -59,7 +59,7 @@ class PackageResolver {
       return
     }
 
-    log.lifecycle "Build tools $buildToolsRevision missing. Downloading...."
+    log.lifecycle "Build tools $buildToolsRevision missing. Downloading..."
 
     def code = androidCommand.update "build-tools-$buildToolsRevision"
     if (code != 0) {

@@ -1,14 +1,32 @@
 SDK Manager Plugin
 ==================
 
-Gradle plugin which downloads and manages your Android SDK.
+SDK missing? API level not downloaded? Support library out-of-date?
+
+These are all typical problems which you shouldn't have to deal with. This is especially painful
+when you have multiple developers on a project or a CI machine that you have to keep up-to-date.
+
+This Gradle plugin will manage these SDK dependencies for you automatically.
+
+Supported functionality:
+
+ * `local.properties` will be created if missing. The `ANDROID_HOME` environment variable will be
+   used if present. Otherwise `~/.android-sdk` will be used.
+ * The platform-specific SDK will be downloaded if missing.
+ * Compilation API declared in `compileSdkVersion` will be downloaded if missing.
+ * If any dependencies are declared on support libraries, the support repository will be downloaded
+   if missing. If the revision of the support repository does not contain the version declared it
+   will be updated.
+ * If any dependencies are declared on Google Play Services, the Google repository will be
+   downloaded if missing. If the revision of the Google repository does not contain the version
+   declared it will be updated.
 
 
 
 Usage
 -----
 
-Apply the plugin in your `build.gradle` before the regular 'android' plugin:
+Apply the plugin in your `build.gradle` *before* the regular 'android' plugin:
 ```groovy
 buildscript {
   repositories {

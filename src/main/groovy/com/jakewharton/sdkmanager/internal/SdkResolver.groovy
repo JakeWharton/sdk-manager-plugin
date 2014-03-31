@@ -21,6 +21,7 @@ class SdkResolver {
   final File userHome
   final File userAndroidTemp
   final File userAndroid
+  final File localProperties
 
   SdkResolver(Project project, System system, Downloader downloader) {
     this.project = project
@@ -30,11 +31,11 @@ class SdkResolver {
     userHome = new File(system.property('user.home'))
     userAndroidTemp = new File(userHome, '.android-sdk.temp')
     userAndroid = new File(userHome, '.android-sdk')
+
+    localProperties = new File(project.rootDir, FN_LOCAL_PROPERTIES)
   }
 
   File resolve() {
-    def localProperties = project.rootProject.file FN_LOCAL_PROPERTIES
-
     // Check for existing local.properties file and the SDK it points to.
     if (localProperties.exists()) {
       log.debug "Found $FN_LOCAL_PROPERTIES at '$localProperties.absolutePath'."
@@ -63,9 +64,7 @@ class SdkResolver {
 
       log.debug "Found $ANDROID_HOME_ENV at '$androidHome'. Writing to $FN_LOCAL_PROPERTIES."
 
-      localProperties.withOutputStream {
-        it << "$SDK_DIR_PROPERTY=$androidHome"
-      }
+      writeLocalProperties androidHome
       return new File(androidHome)
     }
 
@@ -75,10 +74,7 @@ class SdkResolver {
     if (userAndroid.exists()) {
       log.debug "Found existing SDK at '$userAndroid.absolutePath'. Writing to $FN_LOCAL_PROPERTIES."
 
-      localProperties.withOutputStream {
-        it << "$SDK_DIR_PROPERTY=$userAndroid.absolutePath"
-      }
-
+      writeLocalProperties userAndroid.absolutePath
       return userAndroid
     }
 
@@ -88,10 +84,14 @@ class SdkResolver {
     downloader.download(userAndroidTemp, userAndroid)
     log.lifecycle "SDK extracted at '$userAndroid.absolutePath'. Writing to $FN_LOCAL_PROPERTIES."
 
-    localProperties.withOutputStream {
-      it << "$SDK_DIR_PROPERTY=$userAndroid.absolutePath"
-    }
-
+    writeLocalProperties userAndroid.absolutePath
     return userAndroid
+  }
+
+  def writeLocalProperties(String path) {
+    localProperties.withOutputStream {
+      it << "# DO NOT check this file into source control.\n"
+      it << "$SDK_DIR_PROPERTY=$path\n"
+    }
   }
 }

@@ -4,14 +4,15 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.jakewharton.sdkmanager.internal.PackageResolver
 import com.jakewharton.sdkmanager.internal.SdkResolver
-import org.apache.log4j.Logger
+import java.util.concurrent.TimeUnit
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.StopExecutionException
-import java.util.concurrent.TimeUnit
 
 class SdkManagerPlugin implements Plugin<Project> {
-  def log = Logger.getLogger SdkManagerPlugin
+  final Logger log = Logging.getLogger SdkManagerPlugin
 
   @Override void apply(Project project) {
     def hasApp = project.plugins.hasPlugin AppPlugin
@@ -40,6 +41,6 @@ class SdkManagerPlugin implements Plugin<Project> {
     task.run()
     long after = System.nanoTime()
     long took = TimeUnit.NANOSECONDS.toMillis(after - before)
-    log.debug "$name took $took ms."
+    log.info "$name took $took ms."
   }
 }

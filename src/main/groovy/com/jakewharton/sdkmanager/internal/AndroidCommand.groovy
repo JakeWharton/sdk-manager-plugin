@@ -1,6 +1,7 @@
 package com.jakewharton.sdkmanager.internal
 
-import org.apache.log4j.Logger
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 
 import static com.android.SdkConstants.FD_TOOLS
 import static com.android.SdkConstants.androidCmdName
@@ -9,7 +10,7 @@ interface AndroidCommand {
   int update(String filter);
 
   static final class Real implements AndroidCommand {
-    final def log = Logger.getLogger Real
+    final Logger log = Logging.getLogger Real
     final File androidExecutable
 
     Real(File sdk) {

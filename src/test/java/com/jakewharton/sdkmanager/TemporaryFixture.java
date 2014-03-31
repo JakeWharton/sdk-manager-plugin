@@ -2,13 +2,14 @@ package com.jakewharton.sdkmanager;
 
 import java.io.File;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public class TemporaryFixture extends TemporaryFolder {
-  private static final Logger LOG = Logger.getLogger(TemporaryFixture.class);
+  private static final Logger LOG = Logging.getLogger(TemporaryFixture.class);
   private static final String FOLDER_PROJECT = "project";
   private static final String FOLDER_SDK = ".android-sdk";
 

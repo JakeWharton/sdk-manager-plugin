@@ -1,10 +1,11 @@
 package com.jakewharton.sdkmanager.internal
 
 import com.android.sdklib.repository.FullRevision
-import org.apache.log4j.Logger
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.StopExecutionException
 
 import static com.android.SdkConstants.FD_BUILD_TOOLS
@@ -17,7 +18,7 @@ class PackageResolver {
     new PackageResolver(project, sdk, new AndroidCommand.Real(sdk)).resolve()
   }
 
-  final Logger log = Logger.getLogger PackageResolver
+  final Logger log = Logging.getLogger PackageResolver
   final Project project
   final File sdk
   final File buildToolsDir
@@ -58,7 +59,7 @@ class PackageResolver {
       return
     }
 
-    log.info "Build tools $buildToolsRevision missing. Downloading from SDK manager."
+    log.lifecycle "Build tools $buildToolsRevision missing. Downloading from SDK manager."
 
     def code = androidCommand.update "build-tools-$buildToolsRevision"
     if (code != 0) {
@@ -76,7 +77,7 @@ class PackageResolver {
       return
     }
 
-    log.info "Compilation API $compileVersion missing. Downloading from SDK manager."
+    log.lifecycle "Compilation API $compileVersion missing. Downloading from SDK manager."
 
     def code = androidCommand.update compileVersion
     if (code != 0) {
@@ -91,12 +92,12 @@ class PackageResolver {
       return
     }
 
-    log.debug "Found support library dependency: $supportLibraryDeps"
+    log.debug "Found support library dependencies: $supportLibraryDeps"
 
     def needsDownload = false;
     if (!androidRepositoryDir.exists()) {
       needsDownload = true
-      log.info 'Support library repository missing. Downloading from SDK manager.'
+      log.lifecycle 'Support library repository missing. Downloading from SDK manager.'
 
       // Add future repository to the project since the main plugin skips it when missing.
       project.repositories.maven {
@@ -104,7 +105,7 @@ class PackageResolver {
       }
     } else if (!dependenciesAvailable(supportLibraryDeps)) {
       needsDownload = true
-      log.info 'Support library repository outdated. Downloading update from SDK manager.'
+      log.lifecycle 'Support library repository outdated. Downloading update from SDK manager.'
     }
 
     if (needsDownload) {
@@ -122,12 +123,12 @@ class PackageResolver {
       return
     }
 
-    log.debug "Found Play services dependency: $playServicesDeps"
+    log.debug "Found Play services dependencies: $playServicesDeps"
 
     def needsDownload = false;
     if (!googleRepositoryDir.exists()) {
       needsDownload = true
-      log.info 'Play services repository missing. Downloading from SDK manager.'
+      log.lifecycle 'Play services repository missing. Downloading from SDK manager.'
 
       // Add future repository to the project since the main plugin skips it when missing.
       project.repositories.maven {
@@ -135,7 +136,7 @@ class PackageResolver {
       }
     } else if (!dependenciesAvailable(playServicesDeps)) {
       needsDownload = true
-      log.info 'Play services repository outdated. Downloading update from SDK manager.'
+      log.lifecycle 'Play services repository outdated. Downloading update from SDK manager.'
     }
 
     if (needsDownload) {

@@ -1,7 +1,8 @@
 package com.jakewharton.sdkmanager.internal
 
-import org.apache.log4j.Logger
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.StopExecutionException
 
 import static com.android.SdkConstants.ANDROID_HOME_ENV
@@ -13,7 +14,7 @@ class SdkResolver {
     return new SdkResolver(project, new System.Real(), new Downloader.Real()).resolve()
   }
 
-  final def log = Logger.getLogger SdkResolver
+  final Logger log = Logging.getLogger SdkResolver
   final Project project
   final System system
   final Downloader downloader
@@ -43,7 +44,6 @@ class SdkResolver {
       log.debug "Found sdk.dir at '$sdkDirPath'."
       def sdkDir = new File(sdkDirPath)
       if (!sdkDir.exists()) {
-        // TODO test this case!!
         throw new StopExecutionException(
             "Specified SDK directory '$sdkDirPath' in 'local.properties' is not found.")
       }
@@ -76,7 +76,7 @@ class SdkResolver {
       return userAndroid
     }
 
-    log.info 'Downloading and extracting Android SDK.'
+    log.lifecycle 'Downloading and extracting Android SDK.'
 
     // Download the SDK zip and extract it.
     downloader.download(userAndroidTemp, userAndroid)

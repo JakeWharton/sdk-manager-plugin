@@ -1,7 +1,8 @@
 package com.jakewharton.sdkmanager.internal
 
 import org.apache.commons.io.FileUtils
-import org.apache.log4j.Logger
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.rauschig.jarchivelib.ArchiverFactory
 
 import static com.android.SdkConstants.PLATFORM_DARWIN
@@ -31,7 +32,7 @@ enum SdkDownload {
     }
   }
 
-  final def log = Logger.getLogger SdkDownload
+  final Logger log = Logging.getLogger SdkDownload
   final String suffix
   final String ext
 

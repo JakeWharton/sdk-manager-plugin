@@ -119,16 +119,16 @@ class PackageResolver {
   def resolvePlayServiceRepository() {
     def playServicesDeps = findDependenciesWithGroup 'com.google.android.gms'
     if (playServicesDeps.isEmpty()) {
-      log.debug 'No Play services dependency found.'
+      log.debug 'No Google Play Services dependency found.'
       return
     }
 
-    log.debug "Found Play services dependencies: $playServicesDeps"
+    log.debug "Found Google Play Services dependencies: $playServicesDeps"
 
     def needsDownload = false;
     if (!googleRepositoryDir.exists()) {
       needsDownload = true
-      log.lifecycle 'Play services repository missing. Downloading...'
+      log.lifecycle 'Google Play Services repository missing. Downloading...'
 
       // Add future repository to the project since the main plugin skips it when missing.
       project.repositories.maven {
@@ -136,14 +136,14 @@ class PackageResolver {
       }
     } else if (!dependenciesAvailable(playServicesDeps)) {
       needsDownload = true
-      log.lifecycle 'Play services repository outdated. Downloading update...'
+      log.lifecycle 'Google Play Services repository outdated. Downloading update...'
     }
 
     if (needsDownload) {
       def code = androidCommand.update 'extra-google-m2repository'
       if (code != 0) {
         throw new StopExecutionException(
-            "Play services repository download failed with code $code.")
+            "Google Play Services repository download failed with code $code.")
       }
     }
   }

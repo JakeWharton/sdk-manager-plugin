@@ -47,6 +47,25 @@ apply plugin: 'android-sdk-manager'
 apply plugin: 'android'
 ```
 
+On an initial run, the output will look something like this:
+```
+$ ./gradlew clean assemble
+Android SDK not found. Downloading...
+SDK extracted at '/Users/jw/.android-sdk'. Writing to local.properties.
+Build tools 19.0.3 missing. Downloading....
+Compilation API android-19 missing. Downloading...
+Support library repository missing. Downloading...
+Google Play Services repository missing. Downloading...
+
+(normal execution output)
+```
+Your output likely will be different depending on the varying factors listed above. Subsequent runs
+will omit this output and proceed directly to normal execution.
+
+How long does this plugin add to the build lifecycle? It currently takes about 100ms on average to
+check all of the above conditions. This cost is only paid when Gradle is setting up the model for
+the project. If you use the Gradle daemon or use Android Studio this only happens once.
+
 
 
 License

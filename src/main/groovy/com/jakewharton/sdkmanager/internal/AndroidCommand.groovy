@@ -8,7 +8,7 @@ import static com.android.SdkConstants.androidCmdName
 interface AndroidCommand {
   int update(String filter);
 
-  final class Real implements AndroidCommand {
+  static final class Real implements AndroidCommand {
     final def log = Logger.getLogger Real
     final File androidExecutable
 

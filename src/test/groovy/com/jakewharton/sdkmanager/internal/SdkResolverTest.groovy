@@ -38,6 +38,12 @@ class SdkResolverTest {
     sdkResolver = new SdkResolver(project, system, downloader)
   }
 
+  def writeLocalProperties(String path) {
+    localProperties.withOutputStream {
+      it << "$SDK_DIR_PROPERTY=$path"
+    }
+  }
+
   /** Assert that the project's local.properties {@code sdk.dir} points at {@code sdkFolder}. */
   def assertLocalProperties(File sdkFolder) {
     assertThat(localProperties).exists()
@@ -80,11 +86,34 @@ class SdkResolverTest {
     assertLocalProperties(sdk)
   }
 
+  @FixtureName("local-properties")
+  @Test public void localPropertiesExists() {
+    File sdk = new File(fixture.root, 'sdk')
+    writeLocalProperties(sdk.absolutePath)
+    def resolvedSdk = sdkResolver.resolve()
+    assertThat(downloader).isEmpty()
+    assertThat(resolvedSdk).isEqualTo(sdk)
+  }
+
+  @FixtureName("local-properties-from-child-project")
+  @Test public void localPropertiesExistsFromChildProject() {
+    File sdk = new File(fixture.root, 'sdk')
+    writeLocalProperties(sdk.absolutePath)
+
+    def childProject = new ProjectBuilder()
+        .withParent(project)
+        .withProjectDir(new File(fixture.project, 'child'))
+        .build()
+    def childSdkResolver = new SdkResolver(childProject, system, downloader)
+    def resolvedSdk = childSdkResolver.resolve()
+
+    assertThat(downloader).isEmpty()
+    assertThat(resolvedSdk).isEqualTo(sdk)
+  }
+
   @FixtureName("invalid-local-properties")
   @Test public void invalidLocalPropertiesThrows() {
-    localProperties.withOutputStream {
-      it << "$SDK_DIR_PROPERTY=/invalid/pointer"
-    }
+    writeLocalProperties('/invalid/pointer')
     try {
       sdkResolver.resolve()
       failBecauseExceptionWasNotThrown(StopExecutionException)

@@ -32,7 +32,7 @@ class SdkResolver {
   }
 
   File resolve() {
-    def localProperties = project.file FN_LOCAL_PROPERTIES
+    def localProperties = project.rootProject.file FN_LOCAL_PROPERTIES
 
     // Check for existing local.properties file and the SDK it points to.
     if (localProperties.exists()) {

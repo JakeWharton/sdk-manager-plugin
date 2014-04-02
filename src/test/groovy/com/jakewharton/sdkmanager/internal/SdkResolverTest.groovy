@@ -126,16 +126,14 @@ class SdkResolverTest {
     assertThat(downloader).isEmpty()
   }
 
-  @FixtureName("invalid-android-home")
+  @FixtureName("missing-android-home-pointer")
   @Test public void invalidAndroidHomeThrows() {
-    system.env.put ANDROID_HOME_ENV, '/invalid/pointer'
-    try {
-      sdkResolver.resolve()
-      failBecauseExceptionWasNotThrown(StopExecutionException)
-    } catch (StopExecutionException e) {
-      assertThat(e).
-          hasMessage("Specified SDK directory '/invalid/pointer' in 'ANDROID_HOME' is not found.")
-    }
-    assertThat(downloader).isEmpty()
+    File sdk = new File(fixture.root, 'ess-dee-kay')
+    system.env.put ANDROID_HOME_ENV, sdk.absolutePath
+    def resolvedSdk = sdkResolver.resolve()
+    assertThat(downloader).containsExactly('download')
+    assertThat(resolvedSdk).isEqualTo(sdk)
+    assertThat(resolvedSdk).exists()
+    assertLocalProperties(resolvedSdk)
   }
 }

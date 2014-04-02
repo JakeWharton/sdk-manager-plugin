@@ -42,10 +42,11 @@ enum SdkDownload {
   }
 
   /** Download the SDK to {@code temp} and extract to {@code dest}. */
-  void download(File temp, File dest) {
+  void download(File dest) {
     def url = "http://dl.google.com/android/android-sdk_r22.6.2-$suffix.$ext"
     log.debug "Downloading SDK from $url."
 
+    File temp = new File(dest.getParentFile(), 'android-sdk.temp')
     temp.withOutputStream {
       it << new URL(url).content
     }

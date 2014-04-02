@@ -19,7 +19,6 @@ class SdkResolver {
   final System system
   final Downloader downloader
   final File userHome
-  final File userAndroidTemp
   final File userAndroid
   final File localProperties
 
@@ -29,7 +28,6 @@ class SdkResolver {
     this.downloader = downloader
 
     userHome = new File(system.property('user.home'))
-    userAndroidTemp = new File(userHome, '.android-sdk.temp')
     userAndroid = new File(userHome, '.android-sdk')
 
     localProperties = new File(project.rootDir, FN_LOCAL_PROPERTIES)
@@ -57,15 +55,14 @@ class SdkResolver {
     def androidHome = system.env ANDROID_HOME_ENV
     if (androidHome != null) {
       def sdkDir = new File(androidHome)
-      if (!sdkDir.exists()) {
-        throw new StopExecutionException(
-            "Specified SDK directory '$androidHome' in '$ANDROID_HOME_ENV' is not found.")
+      if (sdkDir.exists()) {
+        log.debug "Found $ANDROID_HOME_ENV at '$androidHome'. Writing to $FN_LOCAL_PROPERTIES."
+        writeLocalProperties androidHome
+      } else {
+        log.debug "Found $ANDROID_HOME_ENV at '$androidHome' but directory is missing."
+        downloadSdk sdkDir
       }
-
-      log.debug "Found $ANDROID_HOME_ENV at '$androidHome'. Writing to $FN_LOCAL_PROPERTIES."
-
-      writeLocalProperties androidHome
-      return new File(androidHome)
+      return sdkDir
     }
 
     log.debug "Missing $ANDROID_HOME_ENV."
@@ -78,14 +75,18 @@ class SdkResolver {
       return userAndroid
     }
 
+    downloadSdk userAndroid
+    return userAndroid
+  }
+
+  def downloadSdk(File target) {
     log.lifecycle 'Android SDK not found. Downloading...'
 
     // Download the SDK zip and extract it.
-    downloader.download(userAndroidTemp, userAndroid)
-    log.lifecycle "SDK extracted at '$userAndroid.absolutePath'. Writing to $FN_LOCAL_PROPERTIES."
+    downloader.download target
+    log.lifecycle "SDK extracted at '$target.absolutePath'. Writing to $FN_LOCAL_PROPERTIES."
 
-    writeLocalProperties userAndroid.absolutePath
-    return userAndroid
+    writeLocalProperties target.absolutePath
   }
 
   def writeLocalProperties(String path) {

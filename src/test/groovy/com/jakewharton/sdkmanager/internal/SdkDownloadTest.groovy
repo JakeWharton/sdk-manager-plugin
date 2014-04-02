@@ -22,13 +22,13 @@ class SdkDownloadTest {
   @Rule public TemporaryFolder temp = new TemporaryFolder()
 
   @Test public void downloadAndExtract() {
-    def download = new File(temp.root, 'download')
+    def download = new File(temp.root, 'android-sdk.temp')
     def destination = new File(temp.root, 'destination')
 
     assertThat(download).doesNotExist()
     assertThat(destination).doesNotExist()
 
-    sdkDownload.download download, destination
+    sdkDownload.download destination
 
     assertThat(download).doesNotExist()
     assertThat(destination).exists()

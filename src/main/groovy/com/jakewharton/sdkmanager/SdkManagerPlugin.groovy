@@ -15,9 +15,7 @@ class SdkManagerPlugin implements Plugin<Project> {
   final Logger log = Logging.getLogger SdkManagerPlugin
 
   @Override void apply(Project project) {
-    def hasApp = project.plugins.hasPlugin AppPlugin
-    def hasLib = project.plugins.hasPlugin LibraryPlugin
-    if (hasApp || hasLib) {
+    if (hasAndroidPlugin(project)) {
       throw new StopExecutionException(
           "Must be applied before 'android' or 'android-library' plugin.")
     }
@@ -30,6 +28,11 @@ class SdkManagerPlugin implements Plugin<Project> {
 
     // Defer resolving SDK package dependencies until after the model is finalized.
     project.afterEvaluate {
+      if (!hasAndroidPlugin(project)) {
+        log.debug 'No Android plugin detecting. Skipping package resolution.'
+        return
+      }
+
       time "Package resolve", {
         PackageResolver.resolve project, sdk
       }
@@ -42,5 +45,9 @@ class SdkManagerPlugin implements Plugin<Project> {
     long after = System.nanoTime()
     long took = TimeUnit.NANOSECONDS.toMillis(after - before)
     log.info "$name took $took ms."
+  }
+
+  static def hasAndroidPlugin(Project project) {
+    return project.plugins.hasPlugin(AppPlugin) || project.plugins.hasPlugin(LibraryPlugin)
   }
 }

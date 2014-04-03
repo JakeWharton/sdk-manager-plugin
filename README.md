@@ -13,6 +13,7 @@ Supported functionality:
  * `local.properties` will be created if missing. The `ANDROID_HOME` environment variable will be
    used if present. Otherwise `~/.android-sdk` will be used.
  * The platform-specific SDK will be downloaded if missing.
+ * The build tools and platform tools will be downloaded if missing.
  * Compilation API declared in `compileSdkVersion` will be downloaded if missing.
  * If any dependencies are declared on support libraries, the support repository will be downloaded
    if missing. If the revision of the support repository does not contain the version declared it

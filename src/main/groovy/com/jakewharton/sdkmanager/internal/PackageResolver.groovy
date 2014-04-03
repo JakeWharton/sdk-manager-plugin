@@ -94,15 +94,13 @@ class PackageResolver {
     String compileVersion = project.android.compileSdkVersion
     log.debug "Compile API version: $compileVersion"
 
-    if (compileVersion.contains(GOOGLE_API_PREFIX)) {
-      // the google SDK requires the base android SDK as a prerequisite, but
+    if (compileVersion.startsWith(GOOGLE_API_PREFIX)) {
+      // The google SDK requires the base android SDK as a prerequisite, but
       // the SDK manager won't follow dependencies automatically.
       def baseVersion = compileVersion.replace(GOOGLE_API_PREFIX, "android-")
       installIfMissing(platformsDir, baseVersion)
-
       def addonVersion = compileVersion.replace(GOOGLE_API_PREFIX, "addon-google_apis-google-")
       installIfMissing(addonsDir, addonVersion);
-
     } else {
       installIfMissing(platformsDir, compileVersion);
     }
@@ -111,7 +109,7 @@ class PackageResolver {
   def installIfMissing(baseDir, version) {
     def existingDir = new File(baseDir, version)
     if (existingDir.exists()) {
-      log.debug 'Compilation API found!'
+      log.debug 'Compilation API $version found!'
       return
     }
 
@@ -119,7 +117,7 @@ class PackageResolver {
 
     def code = androidCommand.update version
     if (code != 0) {
-      throw new StopExecutionException("Compilation API download failed with code $code.")
+      throw new StopExecutionException("Compilation API $version download failed with code $code.")
     }
   }
 

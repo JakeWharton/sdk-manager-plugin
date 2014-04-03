@@ -89,6 +89,28 @@ class PackageResolverTest {
     assertThat(androidCommand).containsExactly('update android-19')
   }
 
+  @FixtureName("up-to-date-google-compilation-api")
+  @Test public void googleCompilationApiRecognized() {
+    project.apply plugin: 'android'
+    project.android {
+      compileSdkVersion "Google Inc.:Google APIs:19"
+    }
+
+    packageResolver.resolveCompileVersion()
+    assertThat(androidCommand).isEmpty()
+  }
+
+  @FixtureName("missing-compilation-api")
+  @Test public void googleCompilationApiIsDownloaded() {
+    project.apply plugin: 'android'
+    project.android {
+      compileSdkVersion "Google Inc.:Google APIs:19"
+    }
+
+    packageResolver.resolveCompileVersion()
+    assertThat(androidCommand).containsExactly('update android-19', 'update addon-google_apis-google-19')
+  }
+
   @FixtureName("outdated-compilation-api")
   @Test public void outdatedCompilationApiIsDownloaded() {
     project.apply plugin: 'android'

@@ -109,7 +109,7 @@ class PackageResolver {
   def installIfMissing(baseDir, version) {
     def existingDir = new File(baseDir, version)
     if (existingDir.exists()) {
-      log.debug 'Compilation API $version found!'
+      log.debug "Compilation API $version found!"
       return
     }
 

@@ -67,6 +67,20 @@ class PackageResolverTest {
     assertThat(androidCommand).containsExactly('update build-tools-19.0.3')
   }
 
+  @FixtureName("up-to-date-platform-tools")
+  @Test public void upToDatePlatformToolsRecognized() {
+    project.apply plugin: 'android'
+    packageResolver.resolvePlatformTools()
+    assertThat(androidCommand).isEmpty()
+  }
+
+  @FixtureName("missing-platform-tools")
+  @Test public void missingPlatformToolsAreDownloaded() {
+    project.apply plugin: 'android'
+    packageResolver.resolvePlatformTools()
+    assertThat(androidCommand).containsExactly('update platform-tools')
+  }
+
   @FixtureName("up-to-date-compilation-api")
   @Test public void upToDateCompilationApiRecognized() {
     project.apply plugin: 'android'
@@ -87,6 +101,28 @@ class PackageResolverTest {
 
     packageResolver.resolveCompileVersion()
     assertThat(androidCommand).containsExactly('update android-19')
+  }
+
+  @FixtureName("up-to-date-google-compilation-api")
+  @Test public void googleCompilationApiRecognized() {
+    project.apply plugin: 'android'
+    project.android {
+      compileSdkVersion "Google Inc.:Google APIs:19"
+    }
+
+    packageResolver.resolveCompileVersion()
+    assertThat(androidCommand).isEmpty()
+  }
+
+  @FixtureName("missing-compilation-api")
+  @Test public void googleCompilationApiIsDownloaded() {
+    project.apply plugin: 'android'
+    project.android {
+      compileSdkVersion "Google Inc.:Google APIs:19"
+    }
+
+    packageResolver.resolveCompileVersion()
+    assertThat(androidCommand).containsExactly('update android-19', 'update addon-google_apis-google-19')
   }
 
   @FixtureName("outdated-compilation-api")

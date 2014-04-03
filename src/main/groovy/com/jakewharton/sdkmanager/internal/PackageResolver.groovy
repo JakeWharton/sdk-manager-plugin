@@ -12,6 +12,7 @@ import static com.android.SdkConstants.FD_BUILD_TOOLS
 import static com.android.SdkConstants.FD_EXTRAS
 import static com.android.SdkConstants.FD_M2_REPOSITORY
 import static com.android.SdkConstants.FD_PLATFORMS
+import static com.android.SdkConstants.FD_ADDONS
 
 class PackageResolver {
   static void resolve(Project project, File sdk) {
@@ -23,9 +24,12 @@ class PackageResolver {
   final File sdk
   final File buildToolsDir
   final File platformsDir
+  final File addonsDir
   final File androidRepositoryDir
   final File googleRepositoryDir
   final AndroidCommand androidCommand
+
+  final static String GOOGLE_API_PREFIX = "Google Inc.:Google APIs:"
 
   PackageResolver(Project project, File sdk, AndroidCommand androidCommand) {
     this.sdk = sdk
@@ -34,6 +38,7 @@ class PackageResolver {
 
     buildToolsDir = new File(sdk, FD_BUILD_TOOLS)
     platformsDir = new File(sdk, FD_PLATFORMS)
+    addonsDir = new File(sdk, FD_ADDONS)
 
     def extrasDir = new File(sdk, FD_EXTRAS)
     def androidExtrasDir = new File(extrasDir, 'android')
@@ -71,15 +76,30 @@ class PackageResolver {
     String compileVersion = project.android.compileSdkVersion
     log.debug "Compile API version: $compileVersion"
 
-    def compileVersionDir = new File(platformsDir, compileVersion)
-    if (compileVersionDir.exists()) {
+    if (compileVersion.contains(GOOGLE_API_PREFIX)) {
+      // the google SDK requires the base android SDK as a prerequisite, but
+      // the SDK manager won't follow dependencies automatically.
+      def baseVersion = compileVersion.replace(GOOGLE_API_PREFIX, "android-")
+      installIfMissing(platformsDir, baseVersion)
+
+      def addonVersion = compileVersion.replace(GOOGLE_API_PREFIX, "addon-google_apis-google-")
+      installIfMissing(addonsDir, addonVersion);
+
+    } else {
+      installIfMissing(platformsDir, compileVersion);
+    }
+  }
+
+  def installIfMissing(baseDir, version) {
+    def existingDir = new File(baseDir, version)
+    if (existingDir.exists()) {
       log.debug 'Compilation API found!'
       return
     }
 
-    log.lifecycle "Compilation API $compileVersion missing. Downloading..."
+    log.lifecycle "Compilation API $version missing. Downloading..."
 
-    def code = androidCommand.update compileVersion
+    def code = androidCommand.update version
     if (code != 0) {
       throw new StopExecutionException("Compilation API download failed with code $code.")
     }

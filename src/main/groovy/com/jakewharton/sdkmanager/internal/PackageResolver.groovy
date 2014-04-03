@@ -13,6 +13,7 @@ import static com.android.SdkConstants.FD_EXTRAS
 import static com.android.SdkConstants.FD_M2_REPOSITORY
 import static com.android.SdkConstants.FD_PLATFORMS
 import static com.android.SdkConstants.FD_ADDONS
+import static com.android.SdkConstants.FD_PLATFORM_TOOLS
 
 class PackageResolver {
   static void resolve(Project project, File sdk) {
@@ -23,6 +24,7 @@ class PackageResolver {
   final Project project
   final File sdk
   final File buildToolsDir
+  final File platformToolsDir
   final File platformsDir
   final File addonsDir
   final File androidRepositoryDir
@@ -37,6 +39,7 @@ class PackageResolver {
     this.androidCommand = androidCommand
 
     buildToolsDir = new File(sdk, FD_BUILD_TOOLS)
+    platformToolsDir = new File(sdk, FD_PLATFORM_TOOLS)
     platformsDir = new File(sdk, FD_PLATFORMS)
     addonsDir = new File(sdk, FD_ADDONS)
 
@@ -49,6 +52,7 @@ class PackageResolver {
 
   def resolve() {
     resolveBuildTools()
+    resolvePlatformTools()
     resolveCompileVersion()
     resolveSupportLibraryRepository()
     resolvePlayServiceRepository()
@@ -69,6 +73,20 @@ class PackageResolver {
     def code = androidCommand.update "build-tools-$buildToolsRevision"
     if (code != 0) {
       throw new StopExecutionException("Build tools download failed with code $code.")
+    }
+  }
+
+  def resolvePlatformTools() {
+    if (platformToolsDir.exists()) {
+      log.debug 'Platform tools found!'
+      return
+    }
+
+    log.lifecycle "Platform tools missing. Downloading..."
+
+    def code = androidCommand.update "platform-tools"
+    if (code != 0) {
+      throw new StopExecutionException("Platform tools download failed with code $code.")
     }
   }
 

@@ -67,6 +67,20 @@ class PackageResolverTest {
     assertThat(androidCommand).containsExactly('update build-tools-19.0.3')
   }
 
+  @FixtureName("up-to-date-platform-tools")
+  @Test public void upToDatePlatformToolsRecognized() {
+    project.apply plugin: 'android'
+    packageResolver.resolvePlatformTools()
+    assertThat(androidCommand).isEmpty()
+  }
+
+  @FixtureName("missing-platform-tools")
+  @Test public void missingPlatformToolsAreDownloaded() {
+    project.apply plugin: 'android'
+    packageResolver.resolvePlatformTools()
+    assertThat(androidCommand).containsExactly('update platform-tools')
+  }
+
   @FixtureName("up-to-date-compilation-api")
   @Test public void upToDateCompilationApiRecognized() {
     project.apply plugin: 'android'

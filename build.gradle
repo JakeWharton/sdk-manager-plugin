@@ -10,13 +10,19 @@ buildscript {
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'nexus'
+apply plugin: 'idea'
 
 sourceSets {
   acceptanceTest { sourceSet ->
-    ["java", "groovy", "resources"].each {
-      if (!sourceSet.hasProperty(it)) return
-      sourceSet."$it".srcDir file("src/acceptanceTest/$it")
-    }
+    sourceSet.java.srcDir file('src/acceptanceTest/java')
+    sourceSet.groovy.srcDir file('src/acceptanceTest/groovy')
+  }
+}
+
+idea {
+  module {
+    testSourceDirs += file('src/acceptanceTest/java')
+    testSourceDirs += file('src/acceptanceTest/groovy')
   }
 }
 

@@ -56,7 +56,7 @@ dependencies {
 }
 
 group = 'com.jakewharton.sdkmanager'
-version = '0.9.0'
+version = '0.9.1-SNAPSHOT'
 
 install {
   repositories.mavenInstaller {

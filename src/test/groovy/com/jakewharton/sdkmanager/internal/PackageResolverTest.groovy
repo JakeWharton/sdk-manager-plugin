@@ -122,7 +122,8 @@ class PackageResolverTest {
     }
 
     packageResolver.resolveCompileVersion()
-    assertThat(androidCommand).containsExactly('update android-19', 'update addon-google_apis-google-19')
+    assertThat(androidCommand).
+        containsExactly('update android-19', 'update addon-google_apis-google-19')
   }
 
   @FixtureName("outdated-compilation-api")

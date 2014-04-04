@@ -11,6 +11,25 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'nexus'
 
+sourceSets {
+  acceptanceTest { sourceSet ->
+    ["java", "groovy", "resources"].each {
+      if (!sourceSet.hasProperty(it)) return
+      sourceSet."$it".srcDir file("src/acceptanceTest/$it")
+    }
+  }
+}
+
+task acceptanceTest(type: Test) {
+  testClassesDir = sourceSets.acceptanceTest.output.classesDir
+  classpath = sourceSets.acceptanceTest.runtimeClasspath
+}
+acceptanceTest.mustRunAfter project.tasks.findByName('test')
+acceptanceTest.description = 'Runs the acceptance tests.'
+acceptanceTest.group = JavaBasePlugin.VERIFICATION_GROUP
+
+check.dependsOn acceptanceTest
+
 dependencies {
   repositories {
     mavenCentral()
@@ -23,6 +42,11 @@ dependencies {
   compile 'commons-io:commons-io:2.4'
 
   testCompile 'org.easytesting:fest-assert-core:2.0M10'
+
+  acceptanceTestCompile sourceSets.main.output
+  acceptanceTestCompile sourceSets.test.output
+  acceptanceTestCompile configurations.testCompile
+  acceptanceTestRuntime configurations.testRuntime
 }
 
 group = 'com.jakewharton.sdkmanager'

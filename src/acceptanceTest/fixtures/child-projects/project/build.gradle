@@ -1,0 +1,12 @@
+subprojects {
+  buildscript {
+    repositories {
+      mavenCentral()
+    }
+    dependencies {
+      classpath 'com.android.tools.build:gradle:0.10.+'
+    }
+  }
+
+  apply plugin: com.jakewharton.sdkmanager.SdkManagerPlugin
+}

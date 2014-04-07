@@ -1,0 +1,2 @@
+include ':child1'
+include ':child2'

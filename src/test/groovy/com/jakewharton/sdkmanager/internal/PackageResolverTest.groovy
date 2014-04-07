@@ -14,7 +14,7 @@ import static com.android.SdkConstants.SDK_DIR_PROPERTY
 import static org.fest.assertions.api.Assertions.assertThat
 
 class PackageResolverTest {
-  @Rule public TemporaryFixture fixture = new TemporaryFixture();
+  @Rule public TemporaryFixture fixture = new TemporaryFixture("src/test/fixtures");
 
   Project project
   RecordingAndroidCommand androidCommand

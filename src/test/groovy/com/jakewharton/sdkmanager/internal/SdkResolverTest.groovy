@@ -18,7 +18,7 @@ import static org.fest.assertions.api.Assertions.assertThat
 import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown
 
 class SdkResolverTest {
-  @Rule public TemporaryFixture fixture = new TemporaryFixture();
+  @Rule public TemporaryFixture fixture = new TemporaryFixture("src/test/fixtures");
 
   Project project
   File localProperties

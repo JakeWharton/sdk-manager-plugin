@@ -4,5 +4,7 @@ env:
   global:
     - TERM=dumb
 
+script: ./gradlew check --info --stacktrace
+
 notifications:
   email: false

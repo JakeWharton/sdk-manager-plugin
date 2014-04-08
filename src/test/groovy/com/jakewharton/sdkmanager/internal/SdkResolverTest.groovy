@@ -62,7 +62,7 @@ class SdkResolverTest {
     assertThat(downloader).containsExactly('download')
     assertThat(resolvedSdk).isEqualTo(fixture.sdk)
     assertThat(resolvedSdk).exists()
-    assertLocalProperties(resolvedSdk)
+    assertLocalProperties(fixture.sdk)
   }
 
   @FixtureName("missing-local-properties")
@@ -72,7 +72,7 @@ class SdkResolverTest {
     def resolvedSdk = sdkResolver.resolve()
     assertThat(downloader).isEmpty()
     assertThat(resolvedSdk).isEqualTo(fixture.sdk)
-    assertLocalProperties(resolvedSdk)
+    assertLocalProperties(fixture.sdk)
   }
 
   @FixtureName("missing-local-properties-with-android-home")
@@ -127,13 +127,13 @@ class SdkResolverTest {
   }
 
   @FixtureName("missing-android-home-pointer")
-  @Test public void invalidAndroidHomeThrows() {
+  @Test public void missingAndroidHomePointerDownloads() {
     File sdk = new File(fixture.root, 'ess-dee-kay')
     system.env.put ANDROID_HOME_ENV, sdk.absolutePath
     def resolvedSdk = sdkResolver.resolve()
     assertThat(downloader).containsExactly('download')
     assertThat(resolvedSdk).isEqualTo(sdk)
     assertThat(resolvedSdk).exists()
-    assertLocalProperties(resolvedSdk)
+    assertLocalProperties(sdk)
   }
 }

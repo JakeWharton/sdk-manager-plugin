@@ -40,16 +40,20 @@ class SdkResolver {
       def properties = new Properties()
       localProperties.withInputStream { properties.load it }
       def sdkDirPath = properties.getProperty SDK_DIR_PROPERTY
-      log.debug "Found $SDK_DIR_PROPERTY of '$sdkDirPath'."
-      def sdkDir = new File(sdkDirPath)
-      if (!sdkDir.exists()) {
-        throw new StopExecutionException(
-            "Specified SDK directory '$sdkDirPath' in '$FN_LOCAL_PROPERTIES' is not found.")
+      if (sdkDirPath != null) {
+        log.debug "Found $SDK_DIR_PROPERTY of '$sdkDirPath'."
+        def sdkDir = new File(sdkDirPath)
+        if (!sdkDir.exists()) {
+          throw new StopExecutionException(
+              "Specified SDK directory '$sdkDirPath' in '$FN_LOCAL_PROPERTIES' is not found.")
+        }
+        return sdkDir
       }
-      return sdkDir
-    }
 
-    log.debug "Missing $FN_LOCAL_PROPERTIES."
+      log.debug "Missing $SDK_DIR_PROPERTY in $FN_LOCAL_PROPERTIES."
+    } else {
+      log.debug "Missing $FN_LOCAL_PROPERTIES."
+    }
 
     // Look for ANDROID_HOME environment variable.
     def androidHome = system.env ANDROID_HOME_ENV
@@ -90,9 +94,15 @@ class SdkResolver {
   }
 
   def writeLocalProperties(String path) {
-    localProperties.withOutputStream {
-      it << "# DO NOT check this file into source control.\n"
-      it << "$SDK_DIR_PROPERTY=$path\n"
+    if (localProperties.exists()) {
+      localProperties.withWriterAppend('UTF-8') {
+        it.write "$SDK_DIR_PROPERTY=$path\n" as String
+      }
+    } else {
+      localProperties.withWriter('UTF-8') {
+        it.write "# DO NOT check this file into source control.\n"
+        it.write "$SDK_DIR_PROPERTY=$path\n" as String
+      }
     }
   }
 }

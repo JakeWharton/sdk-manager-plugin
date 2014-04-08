@@ -96,6 +96,17 @@ class SdkResolverTest {
     assertThat(resolvedSdk).isEqualTo(sdk)
   }
 
+  @FixtureName("local-properties-no-sdk-dir")
+  @Test public void localPropertiesNoSdkDir() {
+    localProperties.withOutputStream {
+      it << "foo=bar\n"
+    }
+    def resolvedSdk = sdkResolver.resolve()
+    assertThat(downloader).isEmpty()
+    assertThat(resolvedSdk).isEqualTo(fixture.sdk)
+    assertLocalProperties(fixture.sdk)
+  }
+
   @FixtureName("local-properties-from-child-project")
   @Test public void localPropertiesExistsFromChildProject() {
     File sdk = new File(fixture.root, 'sdk')

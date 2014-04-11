@@ -10,6 +10,8 @@ Version 0.9.1 *(In Development)*
  * New: Platform tools will be downloaded if missing.
  * Fix: Projects applying this plugin but not the 'android' or 'android-library' will no longer
    error.
+ * Fix: Update 'jarchivelib' to preserve file permissions (most notably: the executable bit) when
+   extracting the SDK archive.
 
 
 Version 0.9.0 *(2014-03-30)*

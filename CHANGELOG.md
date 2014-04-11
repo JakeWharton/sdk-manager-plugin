@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-Version 0.9.1 *(In Development)*
---------------------------------
+Version 0.9.1 *(2014-04-10)*
+----------------------------
 
  * New: If `ANDROID_HOME` is set but the directory does not exist, the SDK will be downloaded and
    extracted to its location.

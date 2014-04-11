@@ -12,6 +12,7 @@ Version 0.9.1 *(In Development)*
    error.
  * Fix: Update 'jarchivelib' to preserve file permissions (most notably: the executable bit) when
    extracting the SDK archive.
+ * Fix: Correctly handle a `local.properties` file that is present but lacks the `sdk.dir` property.
 
 
 Version 0.9.0 *(2014-03-30)*

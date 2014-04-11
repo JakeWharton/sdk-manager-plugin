@@ -13,7 +13,7 @@ import static org.fest.assertions.api.Assertions.assertThat
 class SdkDownloadTest {
   @Parameterized.Parameters(name = "{0}")
   public static Iterable<Object[]> data() {
-    return SdkDownload.values().collect { [ it ] as Object[] }
+    return SdkDownload.values().collect { [it] as Object[] }
   }
 
   @Parameterized.Parameter
@@ -32,6 +32,23 @@ class SdkDownloadTest {
 
     assertThat(download).doesNotExist()
     assertThat(destination).exists()
-    assertThat(new File(destination, FD_TOOLS)).exists()
+
+    def tools = new File(destination, FD_TOOLS)
+    assertThat(tools).exists()
+
+    switch (sdkDownload) {
+      case SdkDownload.DARWIN:
+      case SdkDownload.LINUX:
+        def android = new File(tools, 'android')
+        assertThat(android).exists();
+        assertThat(android.canExecute()).isTrue()
+        break;
+      case SdkDownload.WINDOWS:
+        def android = new File(tools, 'android.bat')
+        assertThat(android).exists()
+        break;
+      default:
+        throw new IllegalStateException("Unknown platform: " + sdkDownload);
+    }
   }
 }

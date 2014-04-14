@@ -7,11 +7,14 @@ import org.gradle.api.tasks.StopExecutionException
 
 import static com.android.SdkConstants.ANDROID_HOME_ENV
 import static com.android.SdkConstants.FN_LOCAL_PROPERTIES
+import static com.android.SdkConstants.PLATFORM_WINDOWS
 import static com.android.SdkConstants.SDK_DIR_PROPERTY
+import static com.android.SdkConstants.currentPlatform
 
 class SdkResolver {
   static File resolve(Project project) {
-    return new SdkResolver(project, new System.Real(), new Downloader.Real()).resolve()
+    boolean isWindows = currentPlatform() == PLATFORM_WINDOWS
+    return new SdkResolver(project, new System.Real(), new Downloader.Real(), isWindows).resolve()
   }
 
   final Logger log = Logging.getLogger SdkResolver
@@ -21,11 +24,13 @@ class SdkResolver {
   final File userHome
   final File userAndroid
   final File localProperties
+  final boolean isWindows
 
-  SdkResolver(Project project, System system, Downloader downloader) {
+  SdkResolver(Project project, System system, Downloader downloader, boolean isWindows) {
     this.project = project
     this.system = system
     this.downloader = downloader
+    this.isWindows = isWindows
 
     userHome = new File(system.property('user.home'))
     userAndroid = new File(userHome, '.android-sdk')
@@ -94,6 +99,10 @@ class SdkResolver {
   }
 
   def writeLocalProperties(String path) {
+    if (isWindows) {
+      // Escape Windows file separators when writing as a path.
+      path = path.replace "\\", "\\\\"
+    }
     if (localProperties.exists()) {
       localProperties.withWriterAppend('UTF-8') {
         it.write "$SDK_DIR_PROPERTY=$path\n" as String

@@ -36,7 +36,7 @@ class SdkResolverTest {
     system.properties.put 'user.home', fixture.root.absolutePath
 
     downloader = new RecordingDownloader()
-    sdkResolver = new SdkResolver(project, system, downloader)
+    sdkResolver = new SdkResolver(project, system, downloader, false)
   }
 
   def writeLocalProperties(String path) {
@@ -52,6 +52,16 @@ class SdkResolverTest {
     localProperties.withInputStream { properties.load it }
     def sdkDirPath = properties.getProperty SDK_DIR_PROPERTY
     assertThat(sdkDirPath).isEqualTo(sdkFolder.absolutePath)
+  }
+
+  @Test public void windowsPathIsEscaped() {
+    sdkResolver = new SdkResolver(project, system, downloader, true)
+    sdkResolver.writeLocalProperties "C:\\Foo\\Bar"
+
+    def properties = new Properties()
+    localProperties.withInputStream { properties.load it }
+    def sdkDirPath = properties.getProperty SDK_DIR_PROPERTY
+    assertThat(sdkDirPath).isEqualTo("C:\\Foo\\Bar")
   }
 
   @FixtureName("no-sdk")
@@ -116,7 +126,7 @@ class SdkResolverTest {
         .withParent(project)
         .withProjectDir(new File(fixture.project, 'child'))
         .build()
-    def childSdkResolver = new SdkResolver(childProject, system, downloader)
+    def childSdkResolver = new SdkResolver(childProject, system, downloader, false)
     def resolvedSdk = childSdkResolver.resolve()
 
     assertThat(downloader).isEmpty()

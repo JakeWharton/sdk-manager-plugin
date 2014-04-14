@@ -54,6 +54,7 @@ class SdkResolverTest {
     assertThat(sdkDirPath).isEqualTo(sdkFolder.absolutePath)
   }
 
+  @FixtureName("no-sdk")
   @Test public void windowsPathIsEscaped() {
     sdkResolver = new SdkResolver(project, system, downloader, true)
     sdkResolver.writeLocalProperties "C:\\Foo\\Bar"

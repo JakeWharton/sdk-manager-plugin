@@ -20,6 +20,8 @@ class PackageResolver {
     new PackageResolver(project, sdk, new AndroidCommand.Real(sdk)).resolve()
   }
 
+  static final String GOOGLE_API_PREFIX = "Google Inc.:Google APIs:"
+
   final Logger log = Logging.getLogger PackageResolver
   final Project project
   final File sdk
@@ -30,8 +32,6 @@ class PackageResolver {
   final File androidRepositoryDir
   final File googleRepositoryDir
   final AndroidCommand androidCommand
-
-  final static String GOOGLE_API_PREFIX = "Google Inc.:Google APIs:"
 
   PackageResolver(Project project, File sdk, AndroidCommand androidCommand) {
     this.sdk = sdk

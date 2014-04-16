@@ -4,6 +4,7 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.jakewharton.sdkmanager.internal.PackageResolver
 import com.jakewharton.sdkmanager.internal.SdkResolver
+import com.jakewharton.sdkmanager.internal.System
 import java.util.concurrent.TimeUnit
 import org.gradle.api.Plugin
 import org.gradle.api.Project

@@ -13,4 +13,8 @@ final class FakeSystem implements System {
   @Override String property(String key) {
     return properties.get(key)
   }
+
+  @Override String property(String key, String defaultValue) {
+    return properties.containsValue(key) ? properties.get(key) : defaultValue
+  }
 }

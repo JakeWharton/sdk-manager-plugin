@@ -4,6 +4,7 @@ package com.jakewharton.sdkmanager.internal;
 interface System {
   String env(String name);
   String property(String key);
+  String property(String key, String defaultValue);
 
   static final class Real implements System {
     @Override String env(String name) {
@@ -12,6 +13,10 @@ interface System {
 
     @Override String property(String key) {
       return java.lang.System.getProperty(key);
+    }
+
+    @Override String property(String key, String defaultValue) {
+      return java.lang.System.getProperty(key, defaultValue);
     }
   }
 }

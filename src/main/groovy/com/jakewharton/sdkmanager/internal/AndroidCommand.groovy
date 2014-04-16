@@ -12,18 +12,17 @@ interface AndroidCommand {
   static final class Real implements AndroidCommand {
     final Logger log = Logging.getLogger Real
     final File androidExecutable
+    final System system
 
-    Real(File sdk) {
+    Real(File sdk, System system) {
+      this.system = system
       def toolsDir = new File(sdk, FD_TOOLS)
       androidExecutable = new File(toolsDir, androidCmdName())
       androidExecutable.setExecutable true, false
     }
 
     @Override int update(String filter) {
-      // -a == all
-      // -u == no UI
-      // -t == filter
-      def cmd = [androidExecutable.absolutePath, 'update', 'sdk', '-a', '-u', '-t', filter]
+      def cmd = generateCommand(filter)
       def process = cmd.execute()
 
       // Press 'y' and then enter on the license prompt.
@@ -39,6 +38,23 @@ interface AndroidCommand {
       }
 
       return process.waitFor()
+    }
+
+    def generateCommand(String filter) {
+      // -a == all
+      // -u == no UI
+      // -t == filter
+      // -s == no HTTPS
+      // --proxy-host == hostname of a proxy server
+      // --proxy-port == port of a proxy server
+      def proxyHost = system.property("http.proxyHost");
+      def proxyPort = system.property("http.proxyPort");
+      def result = [androidExecutable.absolutePath, 'update', 'sdk', '-a', '-u'];
+      if (proxyHost != null && proxyPort != null) {
+        result += ['--proxy-host', proxyHost, '--proxy-port', proxyPort]
+      }
+      result += ['-t', filter]
+      return result;
     }
   }
 }

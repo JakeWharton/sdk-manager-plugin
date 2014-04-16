@@ -17,7 +17,7 @@ import static com.android.SdkConstants.FD_PLATFORM_TOOLS
 
 class PackageResolver {
   static void resolve(Project project, File sdk) {
-    new PackageResolver(project, sdk, new AndroidCommand.Real(sdk)).resolve()
+    new PackageResolver(project, sdk, new AndroidCommand.Real(sdk, new System.Real())).resolve()
   }
 
   static final String GOOGLE_API_PREFIX = "Google Inc.:Google APIs:"

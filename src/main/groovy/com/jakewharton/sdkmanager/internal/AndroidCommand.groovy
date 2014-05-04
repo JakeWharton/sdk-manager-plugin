@@ -18,7 +18,6 @@ interface AndroidCommand {
       this.system = system
       def toolsDir = new File(sdk, FD_TOOLS)
       androidExecutable = new File(toolsDir, androidCmdName())
-      androidExecutable.setExecutable true, false
     }
 
     @Override int update(String filter) {
@@ -43,17 +42,19 @@ interface AndroidCommand {
     def generateCommand(String filter) {
       // -a == all
       // -u == no UI
-      // -t == filter
-      // -s == no HTTPS
+      def result = [androidExecutable.absolutePath, 'update', 'sdk', '-a', '-u'];
+
       // --proxy-host == hostname of a proxy server
       // --proxy-port == port of a proxy server
-      def proxyHost = system.property("http.proxyHost");
-      def proxyPort = system.property("http.proxyPort");
-      def result = [androidExecutable.absolutePath, 'update', 'sdk', '-a', '-u'];
+      def proxyHost = system.property('http.proxyHost');
+      def proxyPort = system.property('http.proxyPort');
       if (proxyHost != null && proxyPort != null) {
         result += ['--proxy-host', proxyHost, '--proxy-port', proxyPort]
       }
+
+      // -t == filter
       result += ['-t', filter]
+
       return result;
     }
   }

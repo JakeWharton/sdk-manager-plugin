@@ -130,15 +130,14 @@ class PackageResolver {
 
     log.debug "Found support library dependencies: $supportLibraryDeps"
 
+    project.repositories.maven {
+      url = androidRepositoryDir
+    }
+
     def needsDownload = false;
     if (!androidRepositoryDir.exists()) {
       needsDownload = true
       log.lifecycle 'Support library repository missing. Downloading...'
-
-      // Add future repository to the project since the main plugin skips it when missing.
-      project.repositories.maven {
-        url = androidRepositoryDir
-      }
     } else if (!dependenciesAvailable(supportLibraryDeps)) {
       needsDownload = true
       log.lifecycle 'Support library repository outdated. Downloading update...'
@@ -161,15 +160,14 @@ class PackageResolver {
 
     log.debug "Found Google Play Services dependencies: $playServicesDeps"
 
+    project.repositories.maven {
+      url = googleRepositoryDir
+    }
+
     def needsDownload = false;
     if (!googleRepositoryDir.exists()) {
       needsDownload = true
       log.lifecycle 'Google Play Services repository missing. Downloading...'
-
-      // Add future repository to the project since the main plugin skips it when missing.
-      project.repositories.maven {
-        url = googleRepositoryDir
-      }
     } else if (!dependenciesAvailable(playServicesDeps)) {
       needsDownload = true
       log.lifecycle 'Google Play Services repository outdated. Downloading update...'

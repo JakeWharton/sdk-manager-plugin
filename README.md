@@ -39,8 +39,8 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:0.9.+'
-    classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.9.+'
+    classpath 'com.android.tools.build:gradle:0.10.+'
+    classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.10.+'
   }
 }
 

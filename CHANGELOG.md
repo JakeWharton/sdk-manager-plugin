@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 0.10.1 *(2014-04-05)*
+-----------------------------
+
+ * Fix: Correct missing method error related to benchmarking.
+
+
 Version 0.10.0 *(2014-04-05)*
 -----------------------------
 

@@ -22,7 +22,9 @@ interface AndroidCommand {
 
     @Override int update(String filter) {
       def cmd = generateCommand(filter)
-      def process = cmd.execute()
+      def process = new ProcessBuilder(cmd)
+          .redirectErrorStream(true)
+          .start()
 
       // Press 'y' and then enter on the license prompt.
       def output = new OutputStreamWriter(process.out)

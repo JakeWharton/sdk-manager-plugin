@@ -103,6 +103,22 @@ class PackageResolverTest {
     assertThat(androidCommand).containsExactly('update android-19')
   }
 
+  @FixtureName("empty-compilation-api")
+  @Test public void emptyCompilationApiIsDownloaded() {
+    project.apply plugin: 'android'
+    project.android {
+      compileSdkVersion 19
+    }
+
+    def empty = new File(fixture.sdk, "platforms/android-19/empty.txt")
+    assertThat(empty).exists()
+    empty.delete()
+    assertThat(empty).doesNotExist()
+
+    packageResolver.resolveCompileVersion()
+    assertThat(androidCommand).containsExactly('update android-19')
+  }
+
   @FixtureName("up-to-date-google-compilation-api")
   @Test public void googleCompilationApiRecognized() {
     project.apply plugin: 'android'

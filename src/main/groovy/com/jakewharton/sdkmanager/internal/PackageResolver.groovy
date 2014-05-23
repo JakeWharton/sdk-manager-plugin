@@ -20,6 +20,10 @@ class PackageResolver {
     new PackageResolver(project, sdk, new AndroidCommand.Real(sdk, new System.Real())).resolve()
   }
 
+  static boolean folderExists(File folder) {
+    return folder.exists() && folder.list().length != 0
+  }
+
   static final String GOOGLE_API_PREFIX = "Google Inc.:Google APIs:"
 
   final Logger log = Logging.getLogger PackageResolver
@@ -63,7 +67,7 @@ class PackageResolver {
     log.debug "Build tools version: $buildToolsRevision"
 
     def buildToolsRevisionDir = new File(buildToolsDir, buildToolsRevision.toString())
-    if (buildToolsRevisionDir.exists()) {
+    if (folderExists(buildToolsRevisionDir)) {
       log.debug 'Build tools found!'
       return
     }
@@ -77,7 +81,7 @@ class PackageResolver {
   }
 
   def resolvePlatformTools() {
-    if (platformToolsDir.exists()) {
+    if (folderExists(platformToolsDir)) {
       log.debug 'Platform tools found!'
       return
     }
@@ -108,7 +112,7 @@ class PackageResolver {
 
   def installIfMissing(baseDir, version) {
     def existingDir = new File(baseDir, version)
-    if (existingDir.exists()) {
+    if (folderExists(existingDir)) {
       log.debug "Compilation API $version found!"
       return
     }
@@ -135,7 +139,7 @@ class PackageResolver {
     }
 
     def needsDownload = false;
-    if (!androidRepositoryDir.exists()) {
+    if (!folderExists(androidRepositoryDir)) {
       needsDownload = true
       log.lifecycle 'Support library repository missing. Downloading...'
     } else if (!dependenciesAvailable(supportLibraryDeps)) {
@@ -165,7 +169,7 @@ class PackageResolver {
     }
 
     def needsDownload = false;
-    if (!googleRepositoryDir.exists()) {
+    if (!folderExists(googleRepositoryDir)) {
       needsDownload = true
       log.lifecycle 'Google Play Services repository missing. Downloading...'
     } else if (!dependenciesAvailable(playServicesDeps)) {

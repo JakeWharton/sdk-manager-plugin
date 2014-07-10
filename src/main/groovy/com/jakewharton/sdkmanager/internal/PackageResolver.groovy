@@ -164,8 +164,13 @@ class PackageResolver {
 
     log.debug "Found Google Play Services dependencies: $playServicesDeps"
 
-    project.repositories.maven {
-      url = googleRepositoryDir
+    project.repositories {
+      maven {
+        url = androidRepositoryDir
+      }
+      maven {
+        url = googleRepositoryDir
+      }
     }
 
     def needsDownload = false;

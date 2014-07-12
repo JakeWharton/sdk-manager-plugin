@@ -39,8 +39,8 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:0.10.+'
-    classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.10.+'
+    classpath 'com.android.tools.build:gradle:0.12.+'
+    classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
   }
 }
 
@@ -53,7 +53,7 @@ On an initial run, the output will look something like this:
 $ ./gradlew clean assemble
 Android SDK not found. Downloading...
 SDK extracted at '/Users/jw/.android-sdk'. Writing to local.properties.
-Build tools 19.0.3 missing. Downloading...
+Build tools 20.0.0 missing. Downloading...
 Compilation API android-19 missing. Downloading...
 Support library repository missing. Downloading...
 Google Play Services repository missing. Downloading...

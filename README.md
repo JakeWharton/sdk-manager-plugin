@@ -21,6 +21,8 @@ Supported functionality:
  * If any dependencies are declared on Google Play Services, the Google repository will be
    downloaded if missing. If the revision of the Google repository does not contain the version
    declared it will be updated.
+ * If an emulator is specified, it will be downloaded if missing. If the emulator revision is less
+   than the available revision, it will be updated.
 
 
 *Note: By using this plugin you acknowledge that associated licenses of the components downloaded
@@ -46,6 +48,12 @@ buildscript {
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
+
+// optionally including an emulator
+sdkManager {
+  emulatorVersion 'android-19'
+  emulatorArchitecture 'armeabi-v7a' // optional, defaults to arm
+}
 ```
 
 On an initial run, the output will look something like this:
@@ -57,6 +65,7 @@ Build tools 20.0.0 missing. Downloading...
 Compilation API android-19 missing. Downloading...
 Support library repository missing. Downloading...
 Google Play Services repository missing. Downloading...
+Emulator version not installed or outdated. Downloading...
 
 (normal execution output)
 ```

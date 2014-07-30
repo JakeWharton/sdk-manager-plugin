@@ -1,5 +1,6 @@
 package com.jakewharton.sdkmanager.internal
 
+import com.android.sdklib.repository.FullRevision
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
@@ -7,12 +8,15 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.StopExecutionException
 
+import java.util.regex.Pattern
+
 import static com.android.SdkConstants.FD_BUILD_TOOLS
 import static com.android.SdkConstants.FD_EXTRAS
 import static com.android.SdkConstants.FD_M2_REPOSITORY
 import static com.android.SdkConstants.FD_PLATFORMS
 import static com.android.SdkConstants.FD_ADDONS
 import static com.android.SdkConstants.FD_PLATFORM_TOOLS
+import static com.android.SdkConstants.FD_SYSTEM_IMAGES
 
 class PackageResolver {
   static void resolve(Project project, File sdk) {
@@ -60,6 +64,7 @@ class PackageResolver {
     resolveCompileVersion()
     resolveSupportLibraryRepository()
     resolvePlayServiceRepository()
+    resolveEmulator()
   }
 
   def resolveBuildTools() {
@@ -191,6 +196,72 @@ class PackageResolver {
       if (code != 0) {
         throw new StopExecutionException(
             "Google Play Services repository download failed with code $code.")
+      }
+    }
+  }
+
+  def resolveEmulator() {
+    def emulatorVersion = project.sdkManager.emulatorVersion
+    if (emulatorVersion == null) {
+      log.debug 'No emulator defined'
+      return
+    }
+
+    def emulatorArchitecture = project.sdkManager.emulatorArchitecture
+    if (emulatorArchitecture == null) {
+      emulatorArchitecture = 'armeabi-v7a'
+      log.debug 'No architecture specified, defaulting to armeabi-v7a'
+    }
+
+    log.debug "Found emulator: $emulatorVersion $emulatorArchitecture"
+
+    def emulatorDir = new File(sdk, FD_SYSTEM_IMAGES + "/$emulatorVersion/$emulatorArchitecture")
+    def alternativeEmulatorDir = new File(sdk, FD_SYSTEM_IMAGES + "/$emulatorVersion/default/$emulatorArchitecture")
+    def emulatorPackage = "sys-img-$emulatorArchitecture-$emulatorVersion"
+    def needsDownload = false
+    if (!folderExists(emulatorDir) && !folderExists(alternativeEmulatorDir)) {
+      needsDownload = true
+      log.lifecycle "Emulator $emulatorVersion $emulatorArchitecture missing. Downloading..."
+    } else {
+      def emulatorPropertiesFile = new File(emulatorDir, 'source.properties')
+      if (!emulatorPropertiesFile.canRead()) {
+        emulatorPropertiesFile = new File(alternativeEmulatorDir, 'source.properties')
+        if (!emulatorPropertiesFile.canRead()) {
+          throw new StopExecutionException('Could not read ' + emulatorPropertiesFile.absolutePath)
+        }
+      }
+
+      def emulatorProperties = new Properties()
+      emulatorProperties.load(new FileInputStream(emulatorPropertiesFile))
+      def emulatorRevision = emulatorProperties.getProperty('Pkg.Revision')
+      if (emulatorRevision == null) {
+        throw new StopExecutionException('Could not get the installed emulator revision for ' +
+            emulatorPackage)
+      }
+
+      def currentEmulatorInfo = androidCommand.list emulatorPackage
+      if (currentEmulatorInfo == null || currentEmulatorInfo.isEmpty()) {
+        throw new StopExecutionException('Could not get the current emulator revision for ' +
+            emulatorPackage)
+      }
+
+      def matcher = Pattern.compile("Revision\\ ([0-9]+)").matcher(currentEmulatorInfo)
+      if (!matcher.find()) {
+        throw new StopExecutionException('Could not find the current emulator revision for ' +
+            emulatorPackage)
+      }
+
+      if ((emulatorRevision as int) < (matcher.group(1) as int)) {
+        needsDownload = true
+        log.lifecycle "Emulator $emulatorVersion $emulatorArchitecture outdated. Downloading update..."
+      }
+    }
+
+    if (needsDownload) {
+      def code = androidCommand.update emulatorPackage
+      if (code != 0) {
+        throw new StopExecutionException(
+            "Emulator $emulatorVersion $emulatorArchitecture download failed with code $code.")
       }
     }
   }

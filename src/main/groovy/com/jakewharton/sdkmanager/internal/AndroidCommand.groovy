@@ -8,6 +8,7 @@ import static com.android.SdkConstants.androidCmdName
 
 interface AndroidCommand {
   int update(String filter);
+  String list(String filter);
 
   static final class Real implements AndroidCommand {
     final Logger log = Logging.getLogger Real
@@ -21,7 +22,10 @@ interface AndroidCommand {
     }
 
     @Override int update(String filter) {
-      def cmd = generateCommand(filter)
+      // -a == all
+      // -t == filter
+      def options = ['-a', '-t', filter]
+      def cmd = generateCommand('update', options)
       def process = new ProcessBuilder(cmd)
           .redirectErrorStream(true)
           .start()
@@ -41,10 +45,41 @@ interface AndroidCommand {
       return process.waitFor()
     }
 
-    def generateCommand(String filter) {
+    @Override String list(String filter) {
       // -a == all
+      // -e == extended
+      def cmd = generateCommand('list', ['-a', '-e'])
+      def process = new ProcessBuilder(cmd)
+          .redirectErrorStream(true)
+          .start()
+
+      // Pipe the command output to our log.
+      def input = new InputStreamReader(process.in)
+      def output = ''
+      def line
+      while ((line = input.readLine()) != null) {
+        log.debug line
+        output += line
+      }
+
+      process.waitFor()
+
+      def result = ''
+      output.split('----------').each {
+        if (it.contains(filter)) {
+          result += it
+        }
+      }
+
+      return result
+    }
+
+    def generateCommand(String command, options) {
       // -u == no UI
-      def result = [androidExecutable.absolutePath, 'update', 'sdk', '-a', '-u'];
+      def result = [androidExecutable.absolutePath, command, 'sdk', '-u'];
+      if (options != null) {
+        result += options
+      }
 
       // --proxy-host == hostname of a proxy server
       // --proxy-port == port of a proxy server
@@ -53,9 +88,6 @@ interface AndroidCommand {
       if (proxyHost != null && proxyPort != null) {
         result += ['--proxy-host', proxyHost, '--proxy-port', proxyPort]
       }
-
-      // -t == filter
-      result += ['-t', filter]
 
       return result;
     }

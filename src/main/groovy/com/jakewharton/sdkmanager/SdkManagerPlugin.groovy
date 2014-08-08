@@ -21,6 +21,11 @@ class SdkManagerPlugin implements Plugin<Project> {
           "Must be applied before 'android' or 'android-library' plugin.")
     }
 
+    if (isOfflineBuild(project)) {
+      log.debug 'Offline build. Skipping package resolution.'
+      return
+    }
+
     // Eager resolve the SDK and local.properties pointer.
     def sdk
     time "SDK resolve", {
@@ -50,5 +55,9 @@ class SdkManagerPlugin implements Plugin<Project> {
 
   static def hasAndroidPlugin(Project project) {
     return project.plugins.hasPlugin(AppPlugin) || project.plugins.hasPlugin(LibraryPlugin)
+  }
+
+  static def isOfflineBuild(Project project) {
+    return project.getGradle().getStartParameter().isOffline()
   }
 }

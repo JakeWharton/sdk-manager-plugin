@@ -45,7 +45,7 @@ buildscript {
 }
 
 apply plugin: 'android-sdk-manager'
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 ```
 
 On an initial run, the output will look something like this:

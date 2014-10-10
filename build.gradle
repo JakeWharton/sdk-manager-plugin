@@ -1,9 +1,11 @@
 buildscript {
   repositories {
+    jcenter()
     mavenCentral()
   }
+  
   dependencies {
-    classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.2'
+    classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
   }
 }
 
@@ -30,6 +32,7 @@ task acceptanceTest(type: Test) {
   testClassesDir = sourceSets.acceptanceTest.output.classesDir
   classpath = sourceSets.acceptanceTest.runtimeClasspath
 }
+
 acceptanceTest.mustRunAfter project.tasks.findByName('test')
 acceptanceTest.description = 'Runs the acceptance tests.'
 acceptanceTest.group = JavaBasePlugin.VERIFICATION_GROUP
@@ -43,7 +46,7 @@ dependencies {
 
   compile gradleApi()
   compile localGroovy()
-  compile 'com.android.tools.build:gradle:0.12.1'
+  compile 'com.android.tools.build:gradle:0.13.2'
   compile 'org.rauschig:jarchivelib:0.6.0'
   compile 'commons-io:commons-io:2.4'
 
@@ -63,6 +66,7 @@ install {
     pom.artifactId = 'gradle-plugin'
   }
 }
+
 uploadArchives {
   repositories.mavenDeployer {
     pom.artifactId = 'gradle-plugin'
@@ -99,3 +103,4 @@ modifyPom {
     }
   }
 }
+

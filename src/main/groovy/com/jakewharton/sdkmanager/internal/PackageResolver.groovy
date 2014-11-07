@@ -1,6 +1,5 @@
 package com.jakewharton.sdkmanager.internal
 
-import com.android.sdklib.repository.FullRevision
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
@@ -63,7 +62,7 @@ class PackageResolver {
   }
 
   def resolveBuildTools() {
-    FullRevision buildToolsRevision = project.android.buildToolsRevision
+    def buildToolsRevision = project.android.buildToolsRevision
     log.debug "Build tools version: $buildToolsRevision"
 
     def buildToolsRevisionDir = new File(buildToolsDir, buildToolsRevision.toString())

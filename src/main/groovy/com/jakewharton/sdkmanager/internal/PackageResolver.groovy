@@ -24,6 +24,7 @@ class PackageResolver {
   }
 
   static final String GOOGLE_API_PREFIX = "Google Inc.:Google APIs:"
+  static final String GOOGLE_GDK_PREFIX = "Google Inc.:Glass Development Kit Preview:"
 
   final Logger log = Logging.getLogger PackageResolver
   final Project project
@@ -104,6 +105,9 @@ class PackageResolver {
       installIfMissing(platformsDir, baseVersion)
       def addonVersion = compileVersion.replace(GOOGLE_API_PREFIX, "addon-google_apis-google-")
       installIfMissing(addonsDir, addonVersion);
+    } else if (compileVersion.startsWith(GOOGLE_GDK_PREFIX)) {
+      def gdkVersion = compileVersion.replace(GOOGLE_GDK_PREFIX, "addon-google_gdk-google-")
+      installIfMissing(platformsDir, gdkVersion);
     } else {
       installIfMissing(platformsDir, compileVersion);
     }

@@ -153,6 +153,28 @@ class PackageResolverTest {
     assertThat(androidCommand).containsExactly('update android-19')
   }
 
+  @FixtureName("missing-compilation-api")
+  @Test public void googleGdkIsDownloaded() {
+    project.apply plugin: 'android'
+    project.android {
+      compileSdkVersion "Google Inc.:Glass Development Kit Preview:19"
+    }
+
+    packageResolver.resolveCompileVersion()
+    assertThat(androidCommand).containsExactly('update addon-google_gdk-google-19')
+  }
+
+  @FixtureName("outdated-compilation-api")
+  @Test public void outdatedGoogleGdkIsDownloaded() {
+    project.apply plugin: 'android'
+    project.android {
+      compileSdkVersion "Google Inc.:Glass Development Kit Preview:19"
+    }
+
+    packageResolver.resolveCompileVersion()
+    assertThat(androidCommand).containsExactly('update addon-google_gdk-google-19')
+  }
+
   @FixtureName("missing-android-m2repository")
   @Test public void noSupportLibraryDependencyDoesNotDownload() {
     project.apply plugin: 'android'

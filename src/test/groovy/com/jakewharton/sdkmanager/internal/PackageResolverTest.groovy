@@ -176,7 +176,7 @@ class PackageResolverTest {
   }
 
   @FixtureName("missing-android-m2repository")
-  @Test public void noSupportLibraryDependencyDoesNotDownload() {
+  @Test public void noSupportLibraryOrTestingDependencyDoesNotDownload() {
     project.apply plugin: 'android'
 
     packageResolver.resolveSupportLibraryRepository()
@@ -205,11 +205,33 @@ class PackageResolverTest {
     assertThat(androidCommand).containsExactly('update extra-android-m2repository')
   }
 
+  @FixtureName("missing-android-m2repository")
+  @Test public void missingSupportTestingRepositoryIsDownloaded() {
+    project.apply plugin: 'android'
+    project.dependencies {
+      compile 'com.android.support.test.espresso:espresso-core:2.0'
+    }
+
+    packageResolver.resolveSupportLibraryRepository()
+    assertThat(androidCommand).containsExactly('update extra-android-m2repository')
+  }
+
   @FixtureName("outdated-android-m2repository")
   @Test public void outdatedSupportLibraryRepositoryIsDownloaded() {
     project.apply plugin: 'android'
     project.dependencies {
       compile 'com.android.support:support-v4:19.1.0'
+    }
+
+    packageResolver.resolveSupportLibraryRepository()
+    assertThat(androidCommand).containsExactly('update extra-android-m2repository')
+  }
+
+  @FixtureName("outdated-android-m2repository")
+  @Test public void outdatedSupportTestingRepositoryIsDownloaded() {
+    project.apply plugin: 'android'
+    project.dependencies {
+      compile 'com.android.support.test.espresso:espresso-core:2.0'
     }
 
     packageResolver.resolveSupportLibraryRepository()

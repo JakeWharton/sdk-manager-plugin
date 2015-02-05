@@ -129,13 +129,14 @@ class PackageResolver {
   }
 
   def resolveSupportLibraryRepository() {
-    def supportLibraryDeps = findDependenciesWithGroup 'com.android.support'
-    if (supportLibraryDeps.isEmpty()) {
+    def supportDeps = findDependenciesStartingWith 'com.android.support'
+
+    if (supportDeps.isEmpty()) {
       log.debug 'No support library dependency found.'
       return
     }
 
-    log.debug "Found support library dependencies: $supportLibraryDeps"
+    log.debug "Found support library dependencies: $supportDeps"
 
     project.repositories.maven {
       url = androidRepositoryDir
@@ -145,7 +146,7 @@ class PackageResolver {
     if (!folderExists(androidRepositoryDir)) {
       needsDownload = true
       log.lifecycle 'Support library repository missing. Downloading...'
-    } else if (!dependenciesAvailable(supportLibraryDeps)) {
+    } else if (!dependenciesAvailable(supportDeps)) {
       needsDownload = true
       log.lifecycle 'Support library repository outdated. Downloading update...'
     }
@@ -199,6 +200,18 @@ class PackageResolver {
     for (Configuration configuration : project.configurations) {
       for (Dependency dependency : configuration.dependencies) {
         if (group.equals(dependency.group)) {
+          deps.add dependency
+        }
+      }
+    }
+    return deps
+  }
+
+  def findDependenciesStartingWith(String prefix) {
+    def deps = []
+    for (Configuration configuration : project.configurations) {
+      for (Dependency dependency : configuration.dependencies) {
+        if (dependency.group != null && dependency.group.startsWith(prefix)) {
           deps.add dependency
         }
       }

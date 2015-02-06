@@ -1,16 +1,15 @@
 package com.jakewharton.sdkmanager
-
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.jakewharton.sdkmanager.internal.PackageResolver
 import com.jakewharton.sdkmanager.internal.SdkResolver
-import com.jakewharton.sdkmanager.internal.System
-import java.util.concurrent.TimeUnit
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.StopExecutionException
+
+import java.util.concurrent.TimeUnit
 
 class SdkManagerPlugin implements Plugin<Project> {
   final Logger log = Logging.getLogger SdkManagerPlugin
@@ -25,6 +24,8 @@ class SdkManagerPlugin implements Plugin<Project> {
       log.debug 'Offline build. Skipping package resolution.'
       return
     }
+
+    project.extensions.create("sdkManager", SdkManagerExtension)
 
     // Eager resolve the SDK and local.properties pointer.
     def sdk

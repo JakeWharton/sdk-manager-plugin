@@ -46,7 +46,7 @@ dependencies {
 
   compile gradleApi()
   compile localGroovy()
-  compile 'com.android.tools.build:gradle:0.13.2'
+  compile 'com.android.tools.build:gradle:1.2.2'
   compile 'org.rauschig:jarchivelib:0.6.0'
   compile 'commons-io:commons-io:2.4'
 
@@ -59,7 +59,7 @@ dependencies {
 }
 
 group = 'com.jakewharton.sdkmanager'
-version = '0.12.1-SNAPSHOT'
+version = '1.2.0-SNAPSHOT'
 
 install {
   repositories.mavenInstaller {

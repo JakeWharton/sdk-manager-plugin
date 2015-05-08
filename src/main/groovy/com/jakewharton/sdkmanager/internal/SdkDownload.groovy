@@ -32,7 +32,7 @@ enum SdkDownload {
     }
   }
 
-  final static SDK_VERSION_MAJOR = 24;
+  final static SDK_VERSION_MAJOR = 24.2;
 
   final Logger log = Logging.getLogger SdkDownload
   final String suffix

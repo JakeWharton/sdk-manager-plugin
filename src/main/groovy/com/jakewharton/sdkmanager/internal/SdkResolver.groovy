@@ -62,7 +62,7 @@ class SdkResolver {
 
     // Look for ANDROID_HOME environment variable.
     def androidHome = system.env ANDROID_HOME_ENV
-    if (androidHome != null) {
+    if (androidHome != null && !"".equals(androidHome)) {
       def sdkDir = new File(androidHome)
       if (sdkDir.exists()) {
         log.debug "Found $ANDROID_HOME_ENV at '$androidHome'. Writing to $FN_LOCAL_PROPERTIES."

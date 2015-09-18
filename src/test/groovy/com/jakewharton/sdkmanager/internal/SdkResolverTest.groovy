@@ -76,6 +76,18 @@ class SdkResolverTest {
     assertLocalProperties(fixture.sdk)
   }
 
+  @FixtureName("no-sdk")
+  @Test public void emptyAndroidHomeEnv() {
+    system.env.put ANDROID_HOME_ENV, ""
+    assertThat(fixture.sdk).doesNotExist()
+    assertThat(localProperties).doesNotExist()
+    def resolvedSdk = sdkResolver.resolve()
+    assertThat(downloader).containsExactly('download')
+    assertThat(resolvedSdk).isEqualTo(fixture.sdk)
+    assertThat(resolvedSdk).exists()
+    assertLocalProperties(fixture.sdk)
+  }
+
   @FixtureName("missing-local-properties")
   @Test public void missingLocalProperties() {
     assertThat(fixture.sdk).exists()

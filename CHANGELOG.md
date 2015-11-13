@@ -1,10 +1,10 @@
 Change Log
 ==========
 
-Version 1.2.0 *(In Development)*
+Version 1.5.0 *(In Development)*
 --------------------------------
 
- * New: Support for the 1.2.x Android plugin.
+ * New: Support for the 1.5.x Android plugin.
  * New: Download r24.2 Android SDK.
 
 

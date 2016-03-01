@@ -34,7 +34,11 @@ class SdkManagerPlugin implements Plugin<Project> {
     }
 
     // Defer resolving SDK package dependencies until after the model is finalized.
-    project.afterEvaluate {
+    project.afterEvaluate { ignored, state ->
+      if (state.failure) {
+        return
+      }
+      
       if (!hasAndroidPlugin(project)) {
         log.debug 'No Android plugin detecting. Skipping package resolution.'
         return

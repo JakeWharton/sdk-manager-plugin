@@ -13,7 +13,9 @@ import org.junit.Test
 
 import static com.android.SdkConstants.ANDROID_HOME_ENV
 import static com.android.SdkConstants.FN_LOCAL_PROPERTIES
+import static com.android.SdkConstants.PLATFORM_WINDOWS
 import static com.android.SdkConstants.SDK_DIR_PROPERTY
+import static com.android.SdkConstants.currentPlatform
 import static org.fest.assertions.api.Assertions.assertThat
 import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown
 
@@ -36,13 +38,8 @@ class SdkResolverTest {
     system.properties.put 'user.home', fixture.root.absolutePath
 
     downloader = new RecordingDownloader()
-    sdkResolver = new SdkResolver(project, system, downloader, false)
-  }
-
-  def writeLocalProperties(String path) {
-    localProperties.withOutputStream {
-      it << "$SDK_DIR_PROPERTY=$path"
-    }
+    boolean isWindows = currentPlatform() == PLATFORM_WINDOWS
+    sdkResolver = new SdkResolver(project, system, downloader, isWindows)
   }
 
   /** Assert that the project's local.properties {@code sdk.dir} points at {@code sdkFolder}. */
@@ -113,7 +110,7 @@ class SdkResolverTest {
   @FixtureName("local-properties")
   @Test public void localPropertiesExists() {
     File sdk = new File(fixture.root, 'sdk')
-    writeLocalProperties(sdk.absolutePath)
+    sdkResolver.writeLocalProperties(sdk.absolutePath)
     def resolvedSdk = sdkResolver.resolve()
     assertThat(downloader).isEmpty()
     assertThat(resolvedSdk).isEqualTo(sdk)
@@ -133,7 +130,7 @@ class SdkResolverTest {
   @FixtureName("local-properties-from-child-project")
   @Test public void localPropertiesExistsFromChildProject() {
     File sdk = new File(fixture.root, 'sdk')
-    writeLocalProperties(sdk.absolutePath)
+    sdkResolver.writeLocalProperties(sdk.absolutePath)
 
     def childProject = new ProjectBuilder()
         .withParent(project)
@@ -148,7 +145,7 @@ class SdkResolverTest {
 
   @FixtureName("invalid-local-properties")
   @Test public void invalidLocalPropertiesThrows() {
-    writeLocalProperties('/invalid/pointer')
+    sdkResolver.writeLocalProperties('/invalid/pointer')
     try {
       sdkResolver.resolve()
       failBecauseExceptionWasNotThrown(StopExecutionException)

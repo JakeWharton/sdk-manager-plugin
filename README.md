@@ -1,3 +1,11 @@
+# DEPRECATED
+
+This plugin is deprecated and is no longer being developed. The Android tools team has committed
+to automatically downloading tools and dependencies in v2.2.0 and will be improving it in subsequent releases.
+
+![](http://i.imgur.com/8JsJXzn.jpg)
+
+
 SDK Manager Plugin
 ==================
 

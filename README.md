@@ -1,7 +1,6 @@
 # DEPRECATED
 
-This plugin is deprecated and is no longer being developed. The Android tools team has committed
-to automatically downloading tools and dependencies in v2.2.0 and will be improving it in subsequent releases.
+This plugin is deprecated and is no longer being developed. Tools and dependencies are [automatically downloaded](https://developer.android.com/studio/intro/update.html#download-with-gradle) using version 2.2.0 of the Android Gradle plugin or newer.
 
 ![](http://i.imgur.com/8JsJXzn.jpg)
 
